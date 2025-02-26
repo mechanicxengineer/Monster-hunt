@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "AAAMechanicsEditor Editor Win64 Development (AAAMechanics)",
+            "intelliSenseMode": "msvc-x64",
+            "compileCommands": [
+                "E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_AAAMechanics.json"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17"
+        },
+        {
+            "name": "Win32",
+            "intelliSenseMode": "msvc-x64",
+            "compileCommands": [
+                "E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default.json"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

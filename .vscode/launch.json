@@ -1,0 +1,128 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "AAAMechanics (Debug)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanics Win64 Debug Build",
+			"program": "E:\\Unreal Projects\\AAAMechanics\\Binaries\\Win64\\UE4-Win64-Debug.exe",
+			"args": [
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "AAAMechanics (DebugGame)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanics Win64 DebugGame Build",
+			"program": "E:\\Unreal Projects\\AAAMechanics\\Binaries\\Win64\\UE4-Win64-DebugGame.exe",
+			"args": [
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "AAAMechanics (Development)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanics Win64 Development Build",
+			"program": "E:\\Unreal Projects\\AAAMechanics\\Binaries\\Win64\\UE4.exe",
+			"args": [
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "AAAMechanics (Shipping)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanics Win64 Shipping Build",
+			"program": "E:\\Unreal Projects\\AAAMechanics\\Binaries\\Win64\\UE4-Win64-Shipping.exe",
+			"args": [
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "AAAMechanics (Test)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanics Win64 Test Build",
+			"program": "E:\\Unreal Projects\\AAAMechanics\\Binaries\\Win64\\UE4-Win64-Test.exe",
+			"args": [
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "AAAMechanicsEditor (Debug)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanicsEditor Win64 Debug Build",
+			"program": "E:\\Unreal Engine\\UE_4.27\\Engine\\Binaries\\Win64\\UE4Editor-Win64-Debug.exe",
+			"args": [
+				"E:\\Unreal Projects\\AAAMechanics\\AAAMechanics.uproject"
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "AAAMechanicsEditor (DebugGame)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanicsEditor Win64 DebugGame Build",
+			"program": "E:\\Unreal Engine\\UE_4.27\\Engine\\Binaries\\Win64\\UE4Editor-Win64-DebugGame.exe",
+			"args": [
+				"E:\\Unreal Projects\\AAAMechanics\\AAAMechanics.uproject"
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "AAAMechanicsEditor (Development)",
+			"request": "launch",
+			"preLaunchTask": "AAAMechanicsEditor Win64 Development Build",
+			"program": "E:\\Unreal Engine\\UE_4.27\\Engine\\Binaries\\Win64\\UE4Editor.exe",
+			"args": [
+				"E:\\Unreal Projects\\AAAMechanics\\AAAMechanics.uproject"
+			],
+			"cwd": "E:\\Unreal Engine\\UE_4.27",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "E:\\Unreal Engine\\UE_4.27\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
+		},
+		{
+			"name": "Generate Project Files",
+			"type": "clr",
+			"request": "launch",
+			"program": "E:\\Unreal Engine\\UE_4.27\\Engine\\Binaries\\DotNET\\UnrealBuildTool.exe",
+			"console": "externalTerminal",
+			"args": [
+				"-projectfiles",
+				"-vscode",
+				"-project=E:\\Unreal Projects\\AAAMechanics\\AAAMechanics.uproject",
+				"-game",
+				"-engine"
+			],
+			"internalConsoleOptions": "openOnSessionStart",
+			"cwd": "E:\\Unreal Engine\\UE_4.27"
+		}
+	]
+}
