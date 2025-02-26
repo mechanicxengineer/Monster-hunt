@@ -30,6 +30,18 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float BaseLookupRate;
 
+	/** Sound to play when the character fires */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* FireSound;
+
+	/** Particle system to spawn when the character fires */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* MuzzleFlash;
+
+	/** Montage to play when the character fires */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class UAnimMontage* HipFireMontage;
+
 public:
 	// Sets default values for this character's properties
 	ANiceCharacter();

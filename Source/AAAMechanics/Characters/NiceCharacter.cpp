@@ -1,10 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+//	Engine includes
 #include "NiceCharacter.h"
 #include "Camera//CameraComponent.h"
 #include "GameFramework//SpringArmComponent.h"
 #include "GameFramework//CharacterMovementComponent.h"
+#include "Engine//SkeletalMeshSocket.h"
+#include "Kismet//GameplayStatics.h"
+#include "Sound//SoundCue.h"
+
+//	Custom includes
+#include "..//Common//advlog.h"
 
 // Sets default values
 ANiceCharacter::ANiceCharacter()
@@ -66,6 +72,8 @@ void ANiceCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, &ANiceCharacter::FireWeapon);
 }
 
 void ANiceCharacter::MoveForward(float _value)
@@ -108,5 +116,20 @@ void ANiceCharacter::LookupAtRate(float rate)
 
 void ANiceCharacter::FireWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire Weapon"));
+	if (FireSound) {
+		SHOW("Fire Weapon");
+		UGameplayStatics::PlaySound2D(this, FireSound);
+	}
+	const USkeletalMeshSocket* BarrelSocket{ GetMesh()->GetSocketByName("barrelSocket") };
+	if (BarrelSocket) {
+		const FTransform SocketTransform{ BarrelSocket->GetSocketTransform(GetMesh()) };
+		if (MuzzleFlash) {
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+		}
+	}
+	auto AnimInstance{ GetMesh()->GetAnimInstance() };
+	if (AnimInstance && HipFireMontage) {
+		AnimInstance->Montage_Play(HipFireMontage);
+		AnimInstance->Montage_JumpToSection(FName("StartFire"), HipFireMontage);
+	}
 }
