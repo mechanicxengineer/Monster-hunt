@@ -26,6 +26,15 @@ class AAAMECHANICS_API UNiceAnimInstance : public UAnimInstance
 	/** Wheather or not the character is in moving */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	bool bIsAccelerating;
+	/** Offset yaw for strafing */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float MovementOffsetYaw;
+	/** Last offset yaw for strafing */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float LastMovementOffsetYaw;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	bool bAiming;
 
 public:
 	/**	Initializes the animation instance */
