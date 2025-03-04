@@ -108,5 +108,25 @@
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\MyLog.h",
 		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Item.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Item.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Weapons\\\\Weapon.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Weapons\\\\Weapon.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	}
 ]

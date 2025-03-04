@@ -109,6 +109,20 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	/** Spread factor when shooting */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshairs", meta = (AllowPrivateAccess = "true"))
 	float CrosshairShootingFactor;
+	
+	/** sets a timer between gunshots */
+	FTimerHandle AutoFireTimer;
+	/** left mouse button or right trigger pressed */
+	bool bFireButtonPressed;
+	/** True when we can fire, False when waiting for the timer */
+	bool bShouldFire;
+	/** Rate of automatic gunfire */
+	float AutomaticFireRate;
+
+	/** Timer handle for managing the fire rate */
+	FTimerHandle CrosshairShootingResetTimer;
+	float ShootTimeDuration;
+	bool bFiringBullet;
 
 public:
 	// Sets default values for this character's properties
@@ -155,13 +169,27 @@ protected:
 	/** Set bAiming to true of false with button press */
 	void AimingButtonPressed();
 	void AimingButtonReleased();
+	void CameraInterZoom(float DeltaTime);
+	/** Set look rates based on aiming or not */
+	void SetLookRates();
+	void CalculateCrosshairSpread(float DeltaTime);
+
+	void FireButtonPressed();
+	void FireButtonReleased();
+
+	void StartFireTimer();
+	UFUNCTION()
+	void AutoFireReset();
+
+	/** Line trace for items under the crosshairs */
+	bool TraceUnderCrosshairs(FHitResult& OutHitResult);
 
 public:	
 	// Called every frame
     virtual void Tick(float DeltaTime) override;
-    void SetLookRates();
-    void CameraInterZoom(float DeltaTime);
-	void CalculateCrosshairSpread(float DeltaTime);
+	void StartCrosshairBulletFire();
+	UFUNCTION()
+	void FinishCrosshairBulletFire();
 
     // Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -173,8 +201,9 @@ public:
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	/** Returns bAiming */
 	FORCEINLINE bool GetAiming() const { return bAiming; }
+
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;
-	/***************************************/
+	/*****************************************/
 
 };

@@ -2,15 +2,25 @@
 
 //	Engine includes
 #include "NiceCharacter.h"
+
 #include "Camera//CameraComponent.h"
+
 #include "GameFramework//SpringArmComponent.h"
 #include "GameFramework//CharacterMovementComponent.h"
+
 #include "Engine//SkeletalMeshSocket.h"
+
 #include "Kismet//GameplayStatics.h"
+
 #include "Sound//SoundCue.h"
+
 #include "Particles//ParticleSystemComponent.h"
 
+#include "Components/WidgetComponent.h"
 //	Custom includes
+#include "..//Items//Item.h"
+
+//	Debug includes
 #include "..//Common//advlog.h"
 #include "..//DebugMacros.h"
 
@@ -35,7 +45,20 @@ ANiceCharacter::ANiceCharacter() :
 	  CameraDefaultFieldOfView(0.0f),
 	  CameraZoomedFieldOfView(35.0f),
 	  CameraCurrentFieldOfView(0.0f),
-	  ZoomInterpSpeed(20.0f)
+	  ZoomInterpSpeed(20.0f),
+	  //	Spread factors
+	  CrosshairSpreadMultiplier(0.0f),
+	  CrosshairVelocityFactor(0.0f),
+	  CrosshairInAirFactor(0.0f),
+	  CrosshairAimingFactor(0.0f),
+	  CrosshairShootingFactor(0.0f),
+	  //	Timer variables
+	  ShootTimeDuration(0.05f),
+	  bFiringBullet(false),
+	  //	Automatic fire variables
+	  AutomaticFireRate(0.1f),
+	  bShouldFire(true),
+	  bFireButtonPressed(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -86,46 +109,29 @@ void ANiceCharacter::Tick(float DeltaTime)
     SetLookRates();
 	/** Calculate crosshair spread */
 	CalculateCrosshairSpread(DeltaTime);
+
+	/** Perform a trace to crosshair location to find crosshair spread */
+	FHitResult ItemHitResult;
+	TraceUnderCrosshairs(ItemHitResult);
+	if (ItemHitResult.bBlockingHit) {
+		auto HitItem = Cast<AItem>(ItemHitResult.Actor);
+		if (HitItem && HitItem->GetPickupWidget()) {
+			/** Show Item's visibility  */
+			HitItem->GetPickupWidget()->SetVisibility(true);
+		}
+	}
 }
 
-void ANiceCharacter::SetLookRates()
+void ANiceCharacter::StartCrosshairBulletFire()
 {
-    if (bAiming)
-    {
-        BaseTurnRate = AimingTurnRate;
-        BaseLookupRate = AimingLookUpRate;
-    }
-    else
-    {
-        BaseTurnRate = HipTurnRate;
-        BaseLookupRate = HipLookUpRate;
-    }
+	bFiringBullet = true;
+	GetWorldTimerManager().SetTimer(CrosshairShootingResetTimer, this, 
+		&ANiceCharacter::FinishCrosshairBulletFire, ShootTimeDuration);
 }
 
-void ANiceCharacter::CameraInterZoom(float DeltaTime)
+void ANiceCharacter::FinishCrosshairBulletFire()
 {
-    /**	Interpolate to zoomed fov when aiming */
-    if (bAiming)
-    { // Button pressed
-        CameraCurrentFieldOfView = FMath::FInterpTo(CameraCurrentFieldOfView, CameraZoomedFieldOfView, DeltaTime, ZoomInterpSpeed);
-    }
-    else
-    { // Button released
-        CameraCurrentFieldOfView = FMath::FInterpTo(CameraCurrentFieldOfView, CameraDefaultFieldOfView, DeltaTime, ZoomInterpSpeed);
-    }
-    GetFollowCamera()->SetFieldOfView(CameraCurrentFieldOfView);
-}
-
-void ANiceCharacter::CalculateCrosshairSpread(float DeltaTime)
-{
-	/** Calculate crosshair spread */
-	FVector2D WalkSpeedRange{ 0.0f, 600.0f };
-	FVector2D VelocityMultiplierRange{ 0.0f, 1.0f };
-	FVector Velocity{ GetVelocity() };
-	Velocity.Z = 0.0f;
-	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(
-		WalkSpeedRange, VelocityMultiplierRange, Velocity.Size());
-	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor;
+	bFiringBullet = false;
 }
 
 float ANiceCharacter::GetCrosshairSpreadMultiplier() const
@@ -137,22 +143,23 @@ float ANiceCharacter::GetCrosshairSpreadMultiplier() const
 void ANiceCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	
 	PlayerInputComponent->BindAxis("MoveForward", this, &ANiceCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ANiceCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("TurnRate", this, &ANiceCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ANiceCharacter::LookupAtRate);
 	PlayerInputComponent->BindAxis("Turn", this, &ANiceCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ANiceCharacter::LookUp);
-
+	
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	
-	PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, &ANiceCharacter::FireWeapon);
+	PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, &ANiceCharacter::FireButtonPressed);
+	PlayerInputComponent->BindAction("FireButton", IE_Released, this, &ANiceCharacter::FireButtonReleased);
 	
 	PlayerInputComponent->BindAction("AimingButton", IE_Pressed, this, &ANiceCharacter::AimingButtonPressed);
 	PlayerInputComponent->BindAction("AimingButton", IE_Released, this, &ANiceCharacter::AimingButtonReleased);
-
+	
 }
 
 void ANiceCharacter::MoveForward(float _value)
@@ -161,7 +168,7 @@ void ANiceCharacter::MoveForward(float _value)
 		/** find out which way is forward */
 		const FRotator Rotation{ Controller->GetControlRotation() };
 		const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
-
+		
 		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::X) };
 		AddMovementInput(Direction, _value);
 	}
@@ -173,7 +180,7 @@ void ANiceCharacter::MoveRight(float _value)
 		/** find out which way is forward */
 		const FRotator Rotation{ Controller->GetControlRotation() };
 		const FRotator YawRotation{ 0, Rotation.Yaw, 0 };
-	
+		
 		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::Y) };
 		AddMovementInput(Direction, _value);
 	}
@@ -249,6 +256,8 @@ void ANiceCharacter::FireWeapon()
 		AnimInstance->Montage_Play(HipFireMontage);
 		AnimInstance->Montage_JumpToSection(FName("StartFire"), HipFireMontage);
 	}
+	/** Start bullet fire timer for crosshair */
+	StartCrosshairBulletFire();
 }
 
 bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVector &OutBeamLocation)
@@ -258,10 +267,9 @@ bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVe
 	if (GEngine && GEngine->GameViewport) {
 		GEngine->GameViewport->GetViewportSize(ViewportSize);
 	}
-
+	
 	/** Get screen space location of crosshair */
 	FVector2D CrosshairLocation{ ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f };
-	CrosshairLocation.Y -= 50.0f;
 	FVector CrosshairWorldLocation;
 	FVector CrosshairWorldDirection;
 	
@@ -294,7 +302,7 @@ bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVe
 		}
 		return true;
 	}
-
+	
 	return false;
 }
 
@@ -308,4 +316,134 @@ void ANiceCharacter::AimingButtonReleased()
 {
 	bAiming = false;
 	//GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	
+}
+
+void ANiceCharacter::CameraInterZoom(float DeltaTime)
+{
+	/**	Interpolate to zoomed fov when aiming */
+	if (bAiming)
+	{ // Button pressed
+		CameraCurrentFieldOfView = FMath::FInterpTo(CameraCurrentFieldOfView, CameraZoomedFieldOfView, DeltaTime, ZoomInterpSpeed);
+	}
+	else
+	{ // Button released
+		CameraCurrentFieldOfView = FMath::FInterpTo(CameraCurrentFieldOfView, CameraDefaultFieldOfView, DeltaTime, ZoomInterpSpeed);
+	}
+	GetFollowCamera()->SetFieldOfView(CameraCurrentFieldOfView);
+}
+
+void ANiceCharacter::SetLookRates()
+{
+	if (bAiming) {
+		BaseTurnRate = AimingTurnRate;
+		BaseLookupRate = AimingLookUpRate;
+	}
+	else {
+		BaseTurnRate = HipTurnRate;
+		BaseLookupRate = HipLookUpRate;
+	}
+}
+
+void ANiceCharacter::CalculateCrosshairSpread(float DeltaTime)
+{
+	/** Calculate crosshair spread */
+	FVector2D WalkSpeedRange{ 0.0f, 600.0f };
+	FVector2D VelocityMultiplierRange{ 0.0f, 1.0f };
+	FVector Velocity{ GetVelocity() };
+	Velocity.Z = 0.0f;
+	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(
+		WalkSpeedRange, VelocityMultiplierRange, Velocity.Size());
+
+	/** Calculate crosshair in air factor */
+	if (GetCharacterMovement()->IsFalling()) {			//	are we in the air ?
+		/** Spread factor is 2.25 when in air */
+		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 2.25f, DeltaTime, 2.25f);
+	}
+	else {												//	we are on the ground
+		/** Shrink factor is 0.0 when on the ground */
+		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.0f, DeltaTime, 30.0f);
+	}
+
+	/** Calculate crosshair aiming factor */
+	if (bAiming) {
+		/** Shrink factor is 0.0 when aiming */
+		CrosshairAimingFactor = FMath::FInterpTo(CrosshairAimingFactor, 0.6f, DeltaTime, 30.0f);
+	}
+	else {
+		/** Spread factor is 0.5 when not aiming */
+		CrosshairAimingFactor = FMath::FInterpTo(CrosshairAimingFactor, 0.0f, DeltaTime, 30.0f);
+	}
+
+	if (bFiringBullet) {
+		/** Spread factor is 0.5 when firing */
+		CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.5f, DeltaTime, 60.0f);
+	}
+	else {
+		/** Shrink factor is 0.0 when not firing */
+		CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.0f, DeltaTime, 60.0f);
+	}
+	
+	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor 
+		- CrosshairAimingFactor + CrosshairShootingFactor;
+}
+
+void ANiceCharacter::FireButtonPressed()
+{
+	bFireButtonPressed = true;
+	StartFireTimer();
+}
+
+void ANiceCharacter::FireButtonReleased()
+{
+	bFireButtonPressed = false;
+}
+
+void ANiceCharacter::StartFireTimer()
+{
+	if (bShouldFire) {
+		FireWeapon();
+		bShouldFire = false;
+		GetWorldTimerManager().SetTimer(AutoFireTimer, this, 
+			&ANiceCharacter::AutoFireReset, AutomaticFireRate, false);
+	}
+}
+
+void ANiceCharacter::AutoFireReset()
+{
+	bShouldFire = true;
+	if (bFireButtonPressed) {
+		StartFireTimer();
+	}
+}
+
+bool ANiceCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult)
+{
+	/** Get viewport size */
+	FVector2D ViewportSize;
+	if (GEngine && GEngine->GameViewport) {
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	/** Get screen space location of crosshair */
+	FVector2D CrosshairLocation{ ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f };
+	FVector CrosshairWorldLocation;
+	FVector CrosshairWorldDirection;
+
+	/** Get world position and direction of crosshairs */
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation, CrosshairWorldLocation, CrosshairWorldDirection);
+	
+	if (bScreenToWorld) {
+		const FVector Start{ CrosshairWorldLocation };
+		const FVector End{ CrosshairWorldLocation + CrosshairWorldDirection * 50'000.0f };
+
+		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECollisionChannel::ECC_Visibility);
+		if (OutHitResult.bBlockingHit) {
+			return true;
+		}
+	}
+	
+	return false;
 }
