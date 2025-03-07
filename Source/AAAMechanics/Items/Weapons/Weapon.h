@@ -13,5 +13,22 @@ UCLASS()
 class AAAMECHANICS_API AWeapon : public AItem
 {
 	GENERATED_BODY()
+
+	FTimerHandle ThrowWeaponTimer;
+	float ThrowWeaponTime;
+	bool bFalling;
+
+public:
+	AWeapon();
+	virtual void Tick(float DeltaTime) override;
 	
+	/** adds the impluse to the weapon */
+	void ThrowWeapon();
+	
+protected:
+	void StopFalling();
+
+public:
+
+
 };

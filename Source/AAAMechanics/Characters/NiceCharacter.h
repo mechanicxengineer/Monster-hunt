@@ -123,6 +123,25 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	FTimerHandle CrosshairShootingResetTimer;
 	float ShootTimeDuration;
 	bool bFiringBullet;
+	/** True if we should trace every frame for items */
+	bool bShouldTraceForItems;
+	/** Number of overlapped AItems */
+	int8 OverlappedItemCount;
+
+	/** The AItem we hit last frame */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	class AItem* TraceHitItemLastFrame;
+	
+	/** Currently equipped weapon */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class AWeapon* EquippedWeapon;
+	
+	/** Set this in Blueprint for the default weapon class */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AWeapon> DefaultWeaponClass;
+	/** The item currently hit by our trance in TranceForItems (could be null) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	AItem* TraceHitItem;
 
 public:
 	// Sets default values for this character's properties
@@ -176,18 +195,31 @@ protected:
 
 	void FireButtonPressed();
 	void FireButtonReleased();
-
 	void StartFireTimer();
 	UFUNCTION()
 	void AutoFireReset();
 
 	/** Line trace for items under the crosshairs */
-	bool TraceUnderCrosshairs(FHitResult& OutHitResult);
+	bool TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& OutHitLocation);
+	/** trace for item if Overlapped Item count > 0*/
+	void TraceForItem();
+	/** Spawns a default weapon and equips it */
+	AWeapon* SpawnDefaultWeapon();
+	/** Equip the weapon and attaches it to the mesh */
+	void EquipWeapon(AWeapon* weaponToEquip);
+	/** Detach weapon and let it fall to the ground */
+	void DropWeapon();
+
+	void SelectButtonPressed();
+	void SelectButtonReleased();
+
+	/** Drops currently equipped weapon and equips TranceHitItem */
+	void SwapWeapon(AWeapon* WeaponToSwap);
 
 public:	
 	// Called every frame
     virtual void Tick(float DeltaTime) override;
-	void StartCrosshairBulletFire();
+    void StartCrosshairBulletFire();
 	UFUNCTION()
 	void FinishCrosshairBulletFire();
 
@@ -201,9 +233,13 @@ public:
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	/** Returns bAiming */
 	FORCEINLINE bool GetAiming() const { return bAiming; }
-
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;
+
+	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
+	/** Adds/subtracts to/from OverlappedItemCount and updates bShouldTrceForItem */
+	void IncrementOverlappedItemCount(int8 Amount);
+
 	/*****************************************/
 
 };

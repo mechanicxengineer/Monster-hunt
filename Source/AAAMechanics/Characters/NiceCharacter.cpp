@@ -17,8 +17,12 @@
 #include "Particles//ParticleSystemComponent.h"
 
 #include "Components/WidgetComponent.h"
+#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
+
 //	Custom includes
 #include "..//Items//Item.h"
+#include "..//Items//Weapons//Weapon.h"
 
 //	Debug includes
 #include "..//Common//advlog.h"
@@ -52,13 +56,15 @@ ANiceCharacter::ANiceCharacter() :
 	  CrosshairInAirFactor(0.0f),
 	  CrosshairAimingFactor(0.0f),
 	  CrosshairShootingFactor(0.0f),
+	  //	Automatic fire variables
+	  bFireButtonPressed(false),
+	  bShouldFire(true),
+	  AutomaticFireRate(0.1f),
 	  //	Timer variables
 	  ShootTimeDuration(0.05f),
 	  bFiringBullet(false),
-	  //	Automatic fire variables
-	  AutomaticFireRate(0.1f),
-	  bShouldFire(true),
-	  bFireButtonPressed(false)
+	  //	Trace variables
+	  bShouldTraceForItems(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -96,6 +102,8 @@ void ANiceCharacter::BeginPlay()
 		CameraDefaultFieldOfView = GetFollowCamera()->FieldOfView;
 		CameraCurrentFieldOfView = CameraDefaultFieldOfView;
 	}
+	/** Spawn default weapon and equip it */
+	EquipWeapon(SpawnDefaultWeapon());
 }
 
 // Called every frame
@@ -110,16 +118,97 @@ void ANiceCharacter::Tick(float DeltaTime)
 	/** Calculate crosshair spread */
 	CalculateCrosshairSpread(DeltaTime);
 
-	/** Perform a trace to crosshair location to find crosshair spread */
-	FHitResult ItemHitResult;
-	TraceUnderCrosshairs(ItemHitResult);
-	if (ItemHitResult.bBlockingHit) {
-		auto HitItem = Cast<AItem>(ItemHitResult.Actor);
-		if (HitItem && HitItem->GetPickupWidget()) {
-			/** Show Item's visibility  */
-			HitItem->GetPickupWidget()->SetVisibility(true);
+    TraceForItem();
+}
+
+void ANiceCharacter::TraceForItem()
+{
+	if (bShouldTraceForItems)
+	{
+		FHitResult ItemHitResult;
+		FVector HitLocation;
+		TraceUnderCrosshairs(ItemHitResult, HitLocation);
+		if (ItemHitResult.bBlockingHit) {
+			TraceHitItem = Cast<AItem>(ItemHitResult.Actor);
+			if (TraceHitItem && TraceHitItem->GetPickupWidget()) {
+				/** Show Item's visibility  */
+				TraceHitItem->GetPickupWidget()->SetVisibility(true);
+			}
+			/** We hit an AItem last frame */
+			if (TraceHitItemLastFrame) {
+				if (TraceHitItemLastFrame != TraceHitItem) {
+					/** We are hitting a different aitem this frame from last frame */
+					/** Or AItem is null */
+					TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
+				}
+			}
+			/** store a reference to the item for next frame */
+			TraceHitItemLastFrame = TraceHitItem;
 		}
 	}
+	else if (TraceHitItemLastFrame) {
+		/** 
+		  * No longet overlapping any items 
+		  * Item last frame should not show widget
+		  */
+		TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
+	}
+}
+
+AWeapon* ANiceCharacter::SpawnDefaultWeapon() 
+{
+	/** check the TSubclassOf variable */
+	if (DefaultWeaponClass) {
+		/** spawn the weapon */
+		return GetWorld()->SpawnActor<AWeapon>(DefaultWeaponClass);
+	}
+	return nullptr;
+}
+
+void ANiceCharacter::EquipWeapon(AWeapon* WeaponToEquip)
+{
+	if (WeaponToEquip) {
+		/** Get the hand socket */
+		const USkeletalMeshSocket* RightHandSocket{ GetMesh()->GetSocketByName("right_hand_socket") };
+		if (RightHandSocket) {
+			/** Attach the weapon to the hand socket */
+			RightHandSocket->AttachActor(WeaponToEquip, GetMesh());
+		}
+		/** Set the equipped weapon to the weapon that was passed in */
+		EquippedWeapon = WeaponToEquip;
+		EquippedWeapon->SetItemState(EItemState::EIS_EQUIPPED);
+	}
+}
+
+void ANiceCharacter::DropWeapon()
+{
+	if (EquippedWeapon) {
+		FDetachmentTransformRules detachmentTransformRules{ EDetachmentRule::KeepWorld, true };
+		EquippedWeapon->GetItemMesh()->DetachFromComponent(detachmentTransformRules);
+		
+		EquippedWeapon->SetItemState(EItemState::EIS_FALLING);
+		EquippedWeapon->ThrowWeapon();
+	}
+}
+
+void ANiceCharacter::SelectButtonPressed()
+{
+	if (TraceHitItem) {
+		SwapWeapon(Cast<AWeapon>(TraceHitItem));
+	}
+}
+
+void ANiceCharacter::SelectButtonReleased()
+{
+
+}
+
+void ANiceCharacter::SwapWeapon(AWeapon* WeaponToSwap)
+{
+	DropWeapon();
+	EquipWeapon(WeaponToSwap);
+	TraceHitItem = nullptr;
+	TraceHitItemLastFrame = nullptr;
 }
 
 void ANiceCharacter::StartCrosshairBulletFire()
@@ -159,6 +248,9 @@ void ANiceCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	
 	PlayerInputComponent->BindAction("AimingButton", IE_Pressed, this, &ANiceCharacter::AimingButtonPressed);
 	PlayerInputComponent->BindAction("AimingButton", IE_Released, this, &ANiceCharacter::AimingButtonReleased);
+
+	PlayerInputComponent->BindAction("Select", IE_Pressed, this, &ANiceCharacter::SelectButtonPressed);
+	PlayerInputComponent->BindAction("Select", IE_Released, this, &ANiceCharacter::SelectButtonReleased);
 	
 }
 
@@ -227,7 +319,7 @@ void ANiceCharacter::LookUp(float value)
 void ANiceCharacter::FireWeapon()
 {
 	if (FireSound) {
-		SHOW("Fire Weapon");
+		//SHOW("Fire Weapon");
 		UGameplayStatics::PlaySound2D(this, FireSound);
 	}
 	const USkeletalMeshSocket* BarrelSocket{ GetMesh()->GetSocketByName("barrelSocket") };
@@ -262,6 +354,28 @@ void ANiceCharacter::FireWeapon()
 
 bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVector &OutBeamLocation)
 {
+	/** Check for crosshair trace hit */
+	FHitResult CrosshairHitResult;
+	bool bCrosshairHit = TraceUnderCrosshairs(CrosshairHitResult, OutBeamLocation);
+	if (bCrosshairHit) {
+		/** Tentative beam location - still need to trance from gun */
+		OutBeamLocation = CrosshairHitResult.Location;
+	}
+	else {	//	no crosshair trace hit
+		//	Outbeantrance is the end location for the line trance
+	}
+	//	Perform a second trace, this time from the gun barrel
+	FHitResult WeaponHit;
+	const FVector WeaponTraceStart{ MuzzleSocketLocation };
+	const FVector StartToEnd{ OutBeamLocation - MuzzleSocketLocation };
+	const FVector WeaponTraceEnd{ MuzzleSocketLocation + StartToEnd * 1.25f };
+	GetWorld()->LineTraceSingleByChannel(WeaponHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+	if (WeaponHit.bBlockingHit) {				//	object between barrel and beam end point ?	
+		OutBeamLocation = WeaponHit.Location;
+		return true;
+	}
+	return false;
+
 	/** Get current size of the viewport */
 	FVector2D ViewportSize;
 	if (GEngine && GEngine->GameViewport) {
@@ -292,18 +406,7 @@ bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVe
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImapctParticles, ScreenTraceHit.Location);
 			}
 		}
-		//	perform a second trace to check for blocking hit, this time from the barrel socket
-		FHitResult WeaponHit;
-		const FVector WeaponTraceStart{ MuzzleSocketLocation };
-		const FVector WeaponTraceEnd{ OutBeamLocation };
-		GetWorld()->LineTraceSingleByChannel(WeaponHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
-		if (WeaponHit.bBlockingHit) {				//	object between barrel and beam end point ?	
-			OutBeamLocation = WeaponHit.Location;
-		}
-		return true;
 	}
-	
-	return false;
 }
 
 void ANiceCharacter::AimingButtonPressed()
@@ -316,7 +419,6 @@ void ANiceCharacter::AimingButtonReleased()
 {
 	bAiming = false;
 	//GetCharacterMovement()->MaxWalkSpeed = 600.0f;
-	
 }
 
 void ANiceCharacter::CameraInterZoom(float DeltaTime)
@@ -417,7 +519,7 @@ void ANiceCharacter::AutoFireReset()
 	}
 }
 
-bool ANiceCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult)
+bool ANiceCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& OutHitLocation)
 {
 	/** Get viewport size */
 	FVector2D ViewportSize;
@@ -438,12 +540,26 @@ bool ANiceCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult)
 	if (bScreenToWorld) {
 		const FVector Start{ CrosshairWorldLocation };
 		const FVector End{ CrosshairWorldLocation + CrosshairWorldDirection * 50'000.0f };
+		OutHitLocation  = End;
 
 		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECollisionChannel::ECC_Visibility);
 		if (OutHitResult.bBlockingHit) {
+			OutHitLocation = OutHitResult.Location;
 			return true;
 		}
 	}
-	
 	return false;
 }
+
+void ANiceCharacter::IncrementOverlappedItemCount(int8 Amount)
+{
+	if (OverlappedItemCount + Amount <= 0) {
+		OverlappedItemCount = 0;
+		bShouldTraceForItems = false;
+	}
+	else {
+		OverlappedItemCount += Amount;
+		bShouldTraceForItems = true;
+	}
+}
+

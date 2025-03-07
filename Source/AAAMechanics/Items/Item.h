@@ -6,6 +6,31 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+UENUM(BlueprintType)
+enum class EItemRarity : uint8
+{
+	EIR_DAMAGED 	UMETA(DisplayName = "Damaged"),
+	EIR_COMMON 		UMETA(DisplayName = "Common"),
+	EIR_UNCOMMON 	UMETA(DisplayName = "Uncommon"),
+	EIR_RARE 		UMETA(DisplayName = "Rare"),
+	EIR_LEGENDARY 	UMETA(DisplayName = "Legendary"),
+
+	EIR_MAX 		UMETA(DisplayName = "DefaultMax")
+};
+
+UENUM(BlueprintType)
+enum class EItemState : uint8
+{
+	EIS_PICKUP				UMETA(DisplayName = "Pickup"),
+	EIS_EQUIPINTERPING		UMETA(DisplayName = "EquipInterping"),
+	EIS_EQUIPPED			UMETA(DisplayName = "Equipped"),
+	EIS_PICKEDUP			UMETA(DisplayName = "PickedUp"),
+	EIS_FALLING				UMETA(DisplayName = "Falling"),
+
+	EIS_MAX 				UMETA(DisplayName = "DefaultMax")
+};
+
+
 UCLASS()
 class AAAMECHANICS_API AItem : public AActor
 {
@@ -23,7 +48,30 @@ class AAAMECHANICS_API AItem : public AActor
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* PickupWidget;
 
+	/** Enables item tracing when overlapped */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* AreaSphere;
+
+	/** The name which appers on the Pickup Widget */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	FString ItemName;
+
+	/** Item Count (ammo, health, etc) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	int32 ItemCount;
 	
+	/** Item rarity - determines number of stars in Pickup widget */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	EItemRarity ItemRarity;
+	
+	/** Array of stars to show on the Pickup widget */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	TArray<bool> ActiveStars;
+	
+	/** State of the Item */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	EItemState ItemState;
+
 public:	
 	// Sets default values for this actor's properties
 	AItem();
@@ -32,6 +80,22 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	/** Called when begin overlapping Areasphere */
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	/** Called when end overlapping AreaSphere */
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex);
+
+	/** Set the active stars array of bools based on rarity */
+	void SetActiveStars();
+	/** Set the item properties (name, mesh, etc) based on the ItemState */
+	void SetItemProperties(EItemState State);
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,6 +103,12 @@ public:
 
 	/*************	 GETTTERS	***************/
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
+	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
+	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
+	FORCEINLINE EItemState GetItemState() const { return ItemState; }
+	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
 
+	/*************	 SETTERS	***************/
+	void SetItemState(EItemState State);
 	/******************************************/
 };
