@@ -71,6 +71,39 @@ class AAAMECHANICS_API AItem : public AActor
 	/** State of the Item */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	EItemState ItemState;
+	
+	/** The curve asset to use for the item's Z location when interping */
+	UPROPERTY(EditdefaultsOnly, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class UCurveFloat* ItemZCurve;
+	
+	/** Starting location when interping begins */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	FVector ItemInterpStartLocation;
+	/** Target interp location in fornt of the camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	FVector CameraTargetLocation;
+	/** true when interping */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	bool bInterping;
+	
+	/** Plays when we start interping */
+	FTimerHandle ItemInterpTimer;
+	/** Durtion of the curve and time */
+	UPROPERTY(EditdefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float ZCurveTime;
+	
+	/** Pointer to the Character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class ANiceCharacter* Character;
+	/** X and Y for the item while interping in the equipInterping state */
+	float ItemInterpX;
+	float ItemInterpY;
+	
+	/** Initial yaw offset between the camera and the interping item */
+	float InterpInitialYawOffset;
+	/** Curve used to scale the item when interping */
+	UPROPERTY(EditdefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* ItemScaleCurve;
 
 public:	
 	// Sets default values for this actor's properties
@@ -95,6 +128,11 @@ protected:
 	/** Set the item properties (name, mesh, etc) based on the ItemState */
 	void SetItemProperties(EItemState State);
 
+	/** Called when iteminterping is finished */
+	void FinishInterping();
+
+	/** Handles item interpolation when inerping is true */
+	void ItemInterp(float DeltaTime);
 
 public:	
 	// Called every frame
@@ -110,5 +148,8 @@ public:
 
 	/*************	 SETTERS	***************/
 	void SetItemState(EItemState State);
-	/******************************************/
+	/******************* ***********************/
+	
+	/** Called from the Nicecharacter class */
+	void StartItemCurve(ANiceCharacter* Char);
 };

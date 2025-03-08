@@ -1,132 +1,212 @@
 [
 	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanics.Build.cs",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanics.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanics.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AaaCharacter.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AaaCharacter.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanics.Build.cs",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanics.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanics.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanicsGameMode.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AAAMechanicsGameMode.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPComponent.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPComponent.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPWidget.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPWidget.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Characters\\\\NiceCharacter.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
-		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
-	},
-	{
-		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Characters\\\\NiceCharacter.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Characters\\\\NiceAnimInstance.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Characters\\\\NiceAnimInstance.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Characters\\\\NiceCharacter.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Characters\\\\NiceCharacter.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\AdvFormat.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\AdvLog.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\AdvLog.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\MyCommon.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\MyFormat.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\MyLog.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Common\\\\MyLog.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPComponent.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPComponent.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPWidget.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Components\\\\XPSystem\\\\XPWidget.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Controllers\\\\NicePlayerController.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Controllers\\\\NicePlayerController.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\DebugMacros.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\args.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\chrono.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\color.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\compile.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\core.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\format.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\format-inl.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\locale.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\os.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\ostream.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\posix.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\printf.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Externals\\\\fmt\\\\ranges.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Item.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Item.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Weapons\\\\Weapon.cpp",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	},
 	{
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Weapons\\\\Weapon.h",
-		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.210.rsp\"",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	}
 ]

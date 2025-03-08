@@ -6,8 +6,14 @@
 #include "GameFramework/Character.h"
 #include "NiceCharacter.generated.h"
 
-class USpringArmComponent;
-class UCameraComponent;
+UENUM(BlueprintType)
+enum class EAmmoType : uint8
+{
+	EAT_9MM UMETA(DisplayName="9mm"),
+	EAT_AR UMETA(DisplayName="Assault Rifle"),
+
+	EAT_MAX UMETA(DisplayName="DefaultMax")
+};
 
 UCLASS()
 class AAAMECHANICS_API ANiceCharacter : public ACharacter
@@ -16,11 +22,11 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 
 	/**	CamerBoom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 	
 	/** Camera that follows the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 
 	/** Base trun rate, in deg/sec, Other scaling may affect final turn rate*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -138,10 +144,28 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	
 	/** Set this in Blueprint for the default weapon class */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AWeapon> DefaultWeaponClass;
+	TSubclassOf<AWeapon> DefaultWeaponClass;
 	/** The item currently hit by our trance in TranceForItems (could be null) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	AItem* TraceHitItem;
+	
+	/** Distance outward from the camera for the interp destination */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	float CameraInterpDistance;
+	/** Distance upward from the camera for the interp destination */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	float CameraInterpElevation;
+	
+	/** Map to keep track of ammo of the different ammo types */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	TMap<EAmmoType, int32> AmmoMap;
+	
+	/** Starting amount of 9mm ammo */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	int32 Starting9mmAmmo;
+	/** Starting amount of ar ammo */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	int32 StartingARAmmo;
 
 public:
 	// Sets default values for this character's properties
@@ -216,6 +240,11 @@ protected:
 	/** Drops currently equipped weapon and equips TranceHitItem */
 	void SwapWeapon(AWeapon* WeaponToSwap);
 
+	/** Initialize the ammo map with ammo values */
+	void InitializeAmmoMap();
+	/** Check to make sure our character has ammo */
+	bool WeaponHasAmmo();
+
 public:	
 	// Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -240,6 +269,8 @@ public:
 	/** Adds/subtracts to/from OverlappedItemCount and updates bShouldTrceForItem */
 	void IncrementOverlappedItemCount(int8 Amount);
 
+	FVector GetCameraInterpolatedLocation(float DeltaTime);
+	void GetPickupItem(AItem* Item);
 	/*****************************************/
 
 };

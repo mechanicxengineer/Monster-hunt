@@ -64,7 +64,14 @@ ANiceCharacter::ANiceCharacter() :
 	  ShootTimeDuration(0.05f),
 	  bFiringBullet(false),
 	  //	Trace variables
-	  bShouldTraceForItems(false)
+	  bShouldTraceForItems(false),
+	  OverlappedItemCount(0),
+	  //	Camera interp variables
+	  CameraInterpDistance(250.0f),
+	  CameraInterpElevation(65.0f),
+	  //	Starting ammo amount
+	  Starting9mmAmmo(85),
+	  StartingARAmmo(120)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -104,6 +111,9 @@ void ANiceCharacter::BeginPlay()
 	}
 	/** Spawn default weapon and equip it */
 	EquipWeapon(SpawnDefaultWeapon());
+
+	/** Call the Initialize ammo map */
+	InitializeAmmoMap();
 }
 
 // Called every frame
@@ -194,7 +204,7 @@ void ANiceCharacter::DropWeapon()
 void ANiceCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem) {
-		SwapWeapon(Cast<AWeapon>(TraceHitItem));
+		TraceHitItem->StartItemCurve(this);
 	}
 }
 
@@ -209,6 +219,18 @@ void ANiceCharacter::SwapWeapon(AWeapon* WeaponToSwap)
 	EquipWeapon(WeaponToSwap);
 	TraceHitItem = nullptr;
 	TraceHitItemLastFrame = nullptr;
+}
+
+void ANiceCharacter::InitializeAmmoMap()
+{
+	AmmoMap.Add(EAmmoType::EAT_9MM, Starting9mmAmmo);
+	AmmoMap.Add(EAmmoType::EAT_AR, StartingARAmmo);
+}
+
+bool ANiceCharacter::WeaponHasAmmo()
+{
+	if (EquippedWeapon == nullptr) return false;
+	return EquippedWeapon->GetAmmo() > 0;
 }
 
 void ANiceCharacter::StartCrosshairBulletFire()
@@ -318,13 +340,16 @@ void ANiceCharacter::LookUp(float value)
 
 void ANiceCharacter::FireWeapon()
 {
+	if (EquippedWeapon == nullptr) return;
 	if (FireSound) {
 		//SHOW("Fire Weapon");
 		UGameplayStatics::PlaySound2D(this, FireSound);
 	}
-	const USkeletalMeshSocket* BarrelSocket{ GetMesh()->GetSocketByName("barrelSocket") };
+	const USkeletalMeshSocket* BarrelSocket{ 
+		EquippedWeapon->GetItemMesh()->GetSocketByName("barrelSocket") 
+	};
 	if (BarrelSocket) {
-		const FTransform SocketTransform{ BarrelSocket->GetSocketTransform(GetMesh()) };
+		const FTransform SocketTransform{ BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh()) };
 		if (MuzzleFlash) {
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
@@ -350,6 +375,11 @@ void ANiceCharacter::FireWeapon()
 	}
 	/** Start bullet fire timer for crosshair */
 	StartCrosshairBulletFire();
+
+	if (EquippedWeapon) {
+		/** Subtract 1 from the weapon's ammo */
+		EquippedWeapon->DecreamentAmmo();
+	}
 }
 
 bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVector &OutBeamLocation)
@@ -493,7 +523,9 @@ void ANiceCharacter::CalculateCrosshairSpread(float DeltaTime)
 void ANiceCharacter::FireButtonPressed()
 {
 	bFireButtonPressed = true;
-	StartFireTimer();
+	if (WeaponHasAmmo()){
+		StartFireTimer();
+	}
 }
 
 void ANiceCharacter::FireButtonReleased()
@@ -513,9 +545,11 @@ void ANiceCharacter::StartFireTimer()
 
 void ANiceCharacter::AutoFireReset()
 {
-	bShouldFire = true;
-	if (bFireButtonPressed) {
-		StartFireTimer();
+	if (WeaponHasAmmo()) {
+		bShouldFire = true;
+		if (bFireButtonPressed) {
+			StartFireTimer();
+		}
 	}
 }
 
@@ -563,3 +597,18 @@ void ANiceCharacter::IncrementOverlappedItemCount(int8 Amount)
 	}
 }
 
+FVector ANiceCharacter::GetCameraInterpolatedLocation(float DeltaTime)
+{
+	const FVector CameraWorldLocation{ GetFollowCamera()->GetComponentLocation() };
+	const FVector CameraForwards{ GetFollowCamera()->GetForwardVector() };
+	//	Desired = CameraWorldLocation + Forward * A + UP * B
+	return CameraWorldLocation + CameraForwards * CameraInterpDistance +
+		FVector(0.0f, 0.0f, CameraInterpElevation);
+}
+
+void ANiceCharacter::GetPickupItem(AItem* Item)
+{
+	if (auto Weapon = Cast<AWeapon>(Item)) {
+		SwapWeapon(Weapon);
+	}
+}
