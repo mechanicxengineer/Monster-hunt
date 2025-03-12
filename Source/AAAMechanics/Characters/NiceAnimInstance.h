@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "NiceAnimInstance.generated.h"
 
+class ANiceCharacter;
 /**
  * 
  */
@@ -15,7 +16,7 @@ class AAAMECHANICS_API UNiceAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	class ANiceCharacter* NiceCharacter;
+	ANiceCharacter* NiceCharacter;
 
 	/**	Character's movement speed */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))

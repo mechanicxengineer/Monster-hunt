@@ -104,6 +104,14 @@ class AAAMECHANICS_API AItem : public AActor
 	/** Curve used to scale the item when interping */
 	UPROPERTY(EditdefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* ItemScaleCurve;
+	
+	/** Sound played when item is picked up */
+	UPROPERTY(EditdefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* PickupSound;
+	
+	/** Sound played when the item is equipped */
+	UPROPERTY(EditdefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	USoundCue* EquipSound;
 
 public:	
 	// Sets default values for this actor's properties
@@ -145,6 +153,9 @@ public:
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
 	FORCEINLINE EItemState GetItemState() const { return ItemState; }
 	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
+	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
+	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
+
 
 	/*************	 SETTERS	***************/
 	void SetItemState(EItemState State);

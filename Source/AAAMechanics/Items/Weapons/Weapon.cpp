@@ -6,7 +6,12 @@
 AWeapon::AWeapon() :
     ThrowWeaponTime(0.7f),
     bFalling(false),
-    Ammo(0)
+    Ammo(30),
+    MagazineSize(30),
+    WeaponType(EWeaponType::EWT_SubmachineGun),
+    AmmoType(EAmmoType::EAT_9mm),
+    ReloadMontageSection(FName(TEXT("reloadSmg"))),
+    ClipBoneName(TEXT("smg_clip"))
 {
     PrimaryActorTick.bCanEverTick = true;
 }
@@ -52,6 +57,13 @@ void AWeapon::DecreamentAmmo()
     else {
         --Ammo;
     }
+}
+
+void AWeapon::ReloadAmmo(int32 Amount)
+{
+    UE_CHECK_F_IMPL(Ammo + Amount <= MagazineSize, 
+        TEXT("Attempting to reload with more then magazine size !"));
+    Ammo += Amount;
 }
 
 void AWeapon::StopFalling()

@@ -4,15 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "..//AmmoType.h"
 #include "NiceCharacter.generated.h"
 
 UENUM(BlueprintType)
-enum class EAmmoType : uint8
+enum class ECombatState  : uint8
 {
-	EAT_9MM UMETA(DisplayName="9mm"),
-	EAT_AR UMETA(DisplayName="Assault Rifle"),
+	ECS_Unoccupied						UMETA(DisplayName="Unoccupied"),
+	ECS_FireTimerInProgress 			UMETA(DisplayName="FireTimerInProgress"),
+	ECS_Reloading						UMETA(DisplayName="Reloading"),
 
-	EAT_MAX UMETA(DisplayName="DefaultMax")
+	ECS_Max 							UMETA(DisplayName="DefaultMax")
 };
 
 UCLASS()
@@ -166,6 +168,22 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	/** Starting amount of ar ammo */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
 	int32 StartingARAmmo;
+	
+	/** Combat state, can only fire or reload if Unoccupied */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	ECombatState CombatState;
+	
+	/** Montage for reload animations */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* ReloadingMontage;
+	
+	/** Transform of the clip when we first grab the during reloading */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	FTransform ClipTransform;
+	
+	/** scene component to attach to the character's hand during reloading */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* HandSceneComponent;
 
 public:
 	// Sets default values for this character's properties
@@ -207,8 +225,11 @@ protected:
 	/**
 	 *  Called when the fire button is pressed
 	 */
-	void FireWeapon();
-	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
+    void FireWeapon();
+    void PlayGunFireMontage();
+    void SendBullet();
+    void PlayFireSound();
+    bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 	/** Set bAiming to true of false with button press */
 	void AimingButtonPressed();
 	void AimingButtonReleased();
@@ -220,8 +241,7 @@ protected:
 	void FireButtonPressed();
 	void FireButtonReleased();
 	void StartFireTimer();
-	UFUNCTION()
-	void AutoFireReset();
+	UFUNCTION() void AutoFireReset();
 
 	/** Line trace for items under the crosshairs */
 	bool TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& OutHitLocation);
@@ -245,6 +265,14 @@ protected:
 	/** Check to make sure our character has ammo */
 	bool WeaponHasAmmo();
 
+	/** Bound to the r key */
+	void ReloadButtonPressed();
+	/** Handle Reloading of the weapon */
+	void ReloadWeapon();
+
+	/** checks to use if we have ammo of the EquippedWeapon's ammo type */
+	bool CarryingAmmo();
+
 public:	
 	// Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -254,6 +282,18 @@ public:
 
     // Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	/** Adds/subtracts to/from OverlappedItemCount and updates bShouldTrceForItem */
+	void IncrementOverlappedItemCount(int8 Amount);
+	void GetPickupItem(AItem* Item);
+
+	void FinishReloading();
+	/** called from animNotity_grabClip*/
+	UFUNCTION(BlueprintCallable)
+	void GrabClip();
+	/** called from animNotity_ReplaceClip*/
+	UFUNCTION(BlueprintCallable)
+	void ReleaseClip();
 
 	/*************	 GETTTERS	***************/
 	/**	Returns CameraBoom subobject */
@@ -264,13 +304,9 @@ public:
 	FORCEINLINE bool GetAiming() const { return bAiming; }
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;
-
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
-	/** Adds/subtracts to/from OverlappedItemCount and updates bShouldTrceForItem */
-	void IncrementOverlappedItemCount(int8 Amount);
 
 	FVector GetCameraInterpolatedLocation(float DeltaTime);
-	void GetPickupItem(AItem* Item);
 	/*****************************************/
 
 };
