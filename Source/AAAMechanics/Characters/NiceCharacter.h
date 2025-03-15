@@ -184,6 +184,35 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	/** scene component to attach to the character's hand during reloading */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* HandSceneComponent;
+	
+	/** ture when crouching */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	bool bCrouching;
+	/** regular movement speed */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float BaseMovementSpeed;
+	/** crouch movement speed */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float CrouchingMovementSpeed;
+	
+	/** Current half height of the capsule` */
+	float CurrentCapsuleHalfHeight;
+	/** Half height of the capsule when not crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float StandingCapsuleHalfHeight;
+	/** Half height of the capsule when crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float CrouchingCapsuleHalfHeight;
+	
+	/** Ground friction while not crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float BaseGroundFriction;
+	/** ground friction while crouching */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float CrouchingGroundFriction;
+
+	/** Used fpr knowing when the aiming button is pressed */
+	bool bAimingButtonPressed;
 
 public:
 	// Sets default values for this character's properties
@@ -273,6 +302,16 @@ protected:
 	/** checks to use if we have ammo of the EquippedWeapon's ammo type */
 	bool CarryingAmmo();
 
+	void CrouchButtonPressed();
+
+	virtual void Jump() override;
+
+	/** Inter calsule half height when crouching/ standing */
+	void InterpCapsuleHalfHeight(float DeltaTime);
+
+	void Aim();
+	void StopAiming();
+
 public:	
 	// Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -305,6 +344,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetCrosshairSpreadMultiplier() const;
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
+	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
+	FORCEINLINE bool GetCrouching() const { return bCrouching; }
 
 	FVector GetCameraInterpolatedLocation(float DeltaTime);
 	/*****************************************/

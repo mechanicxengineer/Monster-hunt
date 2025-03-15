@@ -30,4 +30,6 @@
 #define draw_sphere_timed(location, radius, sagment) if(GetWorld()) DrawDebugSphere(GetWorld(), location, radius, sagment, FColor::White, false, 5.0f);
 
 //  messages
-#define show(message) if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, message);
+#define showargplus(msg, ...) if(GEngine) GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::White, FString::Printf(TEXT(msg), __VA_ARGS__));
+#define showargminus(msg, ...) if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, FString::Printf(TEXT(msg), __VA_ARGS__));
+#define show(msg) if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, msg);

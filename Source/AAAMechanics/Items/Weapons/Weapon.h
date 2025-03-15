@@ -58,12 +58,13 @@ class AAAMECHANICS_API AWeapon : public AItem
 public:
 	AWeapon();
 	virtual void Tick(float DeltaTime) override;
-	
+
 	/** adds the impluse to the weapon */
 	void ThrowWeapon();
 	/** called from character class when firing weapon */
 	void DecreamentAmmo();
 	void ReloadAmmo(int32 Amount);
+	bool ClipIsFull();
 	
 	/*************	 GETTERS	***************/
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }

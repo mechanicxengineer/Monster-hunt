@@ -19,6 +19,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 
 //	Custom includes
 #include "..//Items//Item.h"
@@ -41,13 +42,13 @@ ANiceCharacter::ANiceCharacter() :
 	  /** Mouse look sensitivity scale factors */
 	  MouseHipTurnRate(1.0f),
 	  MouseHipLookUpRate(1.0f),
-	  MouseAimingTurnRate(0.2f),
-	  MouseAimingLookUpRate(0.2f),
+	  MouseAimingTurnRate(0.6f),
+	  MouseAimingLookUpRate(0.6f),
 	  /** true when aiming the weapon */
 	  bAiming(false),
 	  /** Camera field of view values */
 	  CameraDefaultFieldOfView(0.0f),
-	  CameraZoomedFieldOfView(35.0f),
+	  CameraZoomedFieldOfView(25.0f),
 	  CameraCurrentFieldOfView(0.0f),
 	  ZoomInterpSpeed(20.0f),
 	  //	Spread factors
@@ -73,7 +74,17 @@ ANiceCharacter::ANiceCharacter() :
 	  Starting9mmAmmo(85),
 	  StartingARAmmo(120),
 	  //	Combat variables
-	  CombatState(ECombatState::ECS_Unoccupied)
+	  CombatState(ECombatState::ECS_Unoccupied),
+	  //	Crouching variables
+	  bCrouching(false),
+	  BaseMovementSpeed(600.0f),
+	  CrouchingMovementSpeed(300.0f),
+	  StandingCapsuleHalfHeight(88.0f),
+	  CrouchingCapsuleHalfHeight(44.0f),
+	  BaseGroundFriction(2.0f),
+	  CrouchingGroundFriction(100.0f),
+	  //	Aiming variables
+	  bAimingButtonPressed(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -81,9 +92,9 @@ ANiceCharacter::ANiceCharacter() :
 	/** Create a camera boom(pulls in towards the character)  */
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 200.0f;										//	The camera follows at this distance behind the character
+	CameraBoom->TargetArmLength = 250.0f;										//	The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true;									//	Rotate the arm based on the controller
-	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 70.0f);
+	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 80.0f);
 
 
 	/**	Create a follow camera */
@@ -119,6 +130,7 @@ void ANiceCharacter::BeginPlay()
 
 	/** Call the Initialize ammo map */
 	InitializeAmmoMap();
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 }
 
 // Called every frame
@@ -132,8 +144,10 @@ void ANiceCharacter::Tick(float DeltaTime)
     SetLookRates();
 	/** Calculate crosshair spread */
 	CalculateCrosshairSpread(DeltaTime);
-
+	/** check overlappedItemCount, then trace for items */
     TraceForItem();
+	/** Interpolate the capsule half height based on crouching/ standing */
+	InterpCapsuleHalfHeight(DeltaTime);
 }
 
 void ANiceCharacter::TraceForItem()
@@ -270,7 +284,7 @@ void ANiceCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("Turn", this, &ANiceCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ANiceCharacter::LookUp);
 	
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ANiceCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	
 	PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, &ANiceCharacter::FireButtonPressed);
@@ -284,6 +298,7 @@ void ANiceCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	
 	PlayerInputComponent->BindAction("ReloadButton", IE_Pressed, this, &ANiceCharacter::ReloadButtonPressed);
 
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ANiceCharacter::CrouchButtonPressed);
 }
 
 void ANiceCharacter::MoveForward(float _value)
@@ -346,6 +361,48 @@ void ANiceCharacter::LookUp(float value)
 		LookUpScaleFactor = MouseHipLookUpRate;
 	}
 	AddControllerPitchInput(value * LookUpScaleFactor);
+}
+
+void ANiceCharacter::Jump()
+{
+	if (bCrouching) {
+		bCrouching = false;
+		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+	}
+	else{
+		Super::Jump();
+	}
+}
+
+void ANiceCharacter::InterpCapsuleHalfHeight(float DeltaTime)
+{
+	float TargetCapsuleHalfHeight{};
+	if (bCrouching)
+		TargetCapsuleHalfHeight = CrouchingCapsuleHalfHeight;
+	else
+		TargetCapsuleHalfHeight = StandingCapsuleHalfHeight;
+
+	const float InterpHalfHeight = FMath::FInterpTo(
+		GetCapsuleComponent()->GetScaledCapsuleHalfHeight(), TargetCapsuleHalfHeight, DeltaTime, 20.0f);
+
+	/** Negative value if crouching; Positive value id standing */
+	const float DeltaCapsuleHalfHeight{ InterpHalfHeight - GetCapsuleComponent()->GetScaledCapsuleHalfHeight() };
+	const FVector MeshOffset{ 0.0f, 0.0f, -DeltaCapsuleHalfHeight };
+
+	GetMesh()->AddLocalOffset(MeshOffset);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(InterpHalfHeight);
+}
+
+void ANiceCharacter::Aim()
+{
+	bAiming = true;
+	GetCharacterMovement()->MaxWalkSpeed = CrouchingMovementSpeed;
+}
+
+void ANiceCharacter::StopAiming()
+{
+	bAiming = false;
+	if (!bCrouching) GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 }
 
 void ANiceCharacter::FireWeapon()
@@ -467,14 +524,16 @@ bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVe
 
 void ANiceCharacter::AimingButtonPressed()
 {
-	bAiming = true;
-	//GetCharacterMovement()->MaxWalkSpeed = 150.0f;
+	bAimingButtonPressed = true;
+	if (CombatState != ECombatState::ECS_Reloading) {
+		Aim();
+	}
 }
 
 void ANiceCharacter::AimingButtonReleased()
 {
-	bAiming = false;
-	//GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	bAimingButtonPressed = false;
+	StopAiming();
 }
 
 void ANiceCharacter::CameraInterZoom(float DeltaTime)
@@ -650,10 +709,11 @@ void ANiceCharacter::ReloadWeapon()
 {
 	if (CombatState != ECombatState::ECS_Unoccupied) return;
 	if (EquippedWeapon == nullptr) return;
-
+	
 	//!	do we have ammo of the correct type?
-	if (CarryingAmmo()) {
+	if (CarryingAmmo() && !EquippedWeapon->ClipIsFull()) {
 		
+		if (bAiming) StopAiming();
 		CombatState = ECombatState::ECS_Reloading;
 		auto* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance && ReloadingMontage) {
@@ -667,8 +727,11 @@ void ANiceCharacter::FinishReloading()
 {
 	/** update the combat state */
 	CombatState = ECombatState::ECS_Unoccupied;
+	if (bAimingButtonPressed) {
+		Aim();
+	}
+
 	if (EquippedWeapon == nullptr) return;
-	
 	const auto ammoType{ EquippedWeapon->GetAmmoType() };
 	/** update the ammomap */
 	if (AmmoMap.Contains(ammoType)) {
@@ -725,4 +788,20 @@ bool ANiceCharacter::CarryingAmmo()
 		return AmmoMap[AmmoType] > 0;
 	}
 	return false;
+}
+
+void ANiceCharacter::CrouchButtonPressed() 
+{
+	if (!GetCharacterMovement()->IsFalling()) {
+		bCrouching = !bCrouching;
+	}
+	if (bCrouching) {
+		GetCharacterMovement()->MaxWalkSpeed = CrouchingMovementSpeed;
+		GetCharacterMovement()->GroundFriction = CrouchingGroundFriction;
+	}
+	else {
+		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+		GetCharacterMovement()->GroundFriction = BaseGroundFriction;
+	}
+
 }
