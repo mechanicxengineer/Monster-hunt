@@ -26,10 +26,18 @@ enum class EItemState : uint8
 	EIS_EQUIPPED			UMETA(DisplayName = "Equipped"),
 	EIS_PICKEDUP			UMETA(DisplayName = "PickedUp"),
 	EIS_FALLING				UMETA(DisplayName = "Falling"),
-
+	
 	EIS_MAX 				UMETA(DisplayName = "DefaultMax")
 };
 
+UENUM(BlueprintType)
+enum class EItemType : uint8
+{
+	EIT_AMMO				UMETA(DisplayName = "Ammo"),
+	EIT_WEAPON				UMETA(DisplayName = "Weapon"),
+
+	EIT_MAX 				UMETA(DisplayName = "DefaultMax")
+};
 
 UCLASS()
 class AAAMECHANICS_API AItem : public AActor
@@ -112,7 +120,14 @@ class AAAMECHANICS_API AItem : public AActor
 	/** Sound played when the item is equipped */
 	UPROPERTY(EditdefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	USoundCue* EquipSound;
-
+	
+	/** Enum for the type of item this Item is */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	EItemType ItemType;
+	
+	/** Index of interp location this is interping to */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	int32 InterpLocIndex;
 public:	
 	// Sets default values for this actor's properties
 	AItem();
@@ -134,13 +149,19 @@ protected:
 	/** Set the active stars array of bools based on rarity */
 	void SetActiveStars();
 	/** Set the item properties (name, mesh, etc) based on the ItemState */
-	void SetItemProperties(EItemState State);
+	virtual void SetItemProperties(EItemState State);
 
 	/** Called when iteminterping is finished */
 	void FinishInterping();
 
 	/** Handles item interpolation when inerping is true */
 	void ItemInterp(float DeltaTime);
+
+	/** Get interp location based on the item type */
+	FVector GetInterpLocation();
+
+	void PlayPickupSound();
+	
 
 public:	
 	// Called every frame
@@ -155,7 +176,9 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
 	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
 	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
+	FORCEINLINE int32 GetItemCount() const { return ItemCount; }
 
+	void PlayEquipSound();
 
 	/*************	 SETTERS	***************/
 	void SetItemState(EItemState State);

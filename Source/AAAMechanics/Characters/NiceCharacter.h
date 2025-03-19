@@ -17,6 +17,21 @@ enum class ECombatState  : uint8
 	ECS_Max 							UMETA(DisplayName="DefaultMax")
 };
 
+USTRUCT(BlueprintType)
+struct FInterpLocation
+{
+	GENERATED_BODY()
+
+	/** Scene component to use for this location for interping */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USceneComponent* SceneComponent;
+
+	/** Number of items interping to/at this scene comp location */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 ItemCount;
+};
+
+
 UCLASS()
 class AAAMECHANICS_API ANiceCharacter : public ACharacter
 {
@@ -210,9 +225,50 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	/** ground friction while crouching */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float CrouchingGroundFriction;
-
+	
 	/** Used fpr knowing when the aiming button is pressed */
 	bool bAimingButtonPressed;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* WeaponInterpComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InterpComp1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InterpComp2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InterpComp3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InterpComp4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InterpComp5;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InterpComp6;
+
+	/** Array of interp location structs */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TArray<FInterpLocation> InterpLocations;
+
+	FTimerHandle PickupSoundTimer;
+	FTimerHandle EquipSoundTimer;
+
+	bool bShouldPlayPickupSound;
+	bool bShouldPlayEquipSound;
+	
+	/** Time to wait before we can play another pickup sound */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	float PickupSoundResetTime;
+	/** Time to wait before we can play another equip sound */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
+	float EquipSoundResetTime;
+
+	void ResetPickupSoundTimer();
+	void ResetEquipSoundTimer();
 
 public:
 	// Sets default values for this character's properties
@@ -312,6 +368,10 @@ protected:
 	void Aim();
 	void StopAiming();
 
+	void PickupAmmo(class AAmmo* Ammo);
+	void InitializeInterpLocations();
+	
+
 public:	
 	// Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -333,7 +393,18 @@ public:
 	/** called from animNotity_ReplaceClip*/
 	UFUNCTION(BlueprintCallable)
 	void ReleaseClip();
-
+	
+	/** No longer needed; Aitem has GetInterpLocation */
+	//FVector GetCameraInterpolatedLocation();
+	
+	FInterpLocation GetInterpLocation(int32 Index);
+	/** return the index in interplocations array with the lowest itemcount */
+	int32 GetInterpLocationIndex();
+	void IncrementInterpLocationItemCount(int32 Index, int32 Amount);
+	
+	void StartPickupSoundTimer();
+	void StartEquipSoundTimer();
+	
 	/*************	 GETTTERS	***************/
 	/**	Returns CameraBoom subobject */
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return	CameraBoom; }
@@ -346,8 +417,10 @@ public:
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 	FORCEINLINE bool GetCrouching() const { return bCrouching; }
+	FORCEINLINE bool ShouldPlayPickupSound() const { return bShouldPlayEquipSound; }
+	FORCEINLINE bool ShouldPlayEquipSound() const { return bShouldPlayPickupSound; }
+	
 
-	FVector GetCameraInterpolatedLocation(float DeltaTime);
 	/*****************************************/
-
+	
 };

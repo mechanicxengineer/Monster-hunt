@@ -11,7 +11,6 @@
 #include "Engine//SkeletalMeshSocket.h"
 
 #include "Kismet//GameplayStatics.h"
-
 #include "Sound//SoundCue.h"
 
 #include "Particles//ParticleSystemComponent.h"
@@ -23,6 +22,7 @@
 
 //	Custom includes
 #include "..//Items//Item.h"
+#include "..//Items//Ammo.h"
 #include "..//Items//Weapons//Weapon.h"
 
 //	Debug includes
@@ -84,9 +84,14 @@ ANiceCharacter::ANiceCharacter() :
 	  BaseGroundFriction(2.0f),
 	  CrouchingGroundFriction(100.0f),
 	  //	Aiming variables
-	  bAimingButtonPressed(false)
+	  bAimingButtonPressed(false),
+	  //	Pickup sound timer properties
+	  bShouldPlayPickupSound(true),
+	  bShouldPlayEquipSound(true),
+	  PickupSoundResetTime(0.2f),
+	  EquipSoundResetTime(0.2f)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	/** Create a camera boom(pulls in towards the character)  */
@@ -115,6 +120,29 @@ ANiceCharacter::ANiceCharacter() :
 
 	/** Create hand scene component */
 	HandSceneComponent = CreateDefaultSubobject<USceneComponent>("HandSceneComponent");
+
+	/** Create interpolation component */
+	WeaponInterpComp = CreateDefaultSubobject<USceneComponent>("Weapon Interp Component");
+	WeaponInterpComp->SetupAttachment(GetFollowCamera());
+
+	InterpComp1 = CreateDefaultSubobject<USceneComponent>("Interp Component 1");
+	InterpComp1->SetupAttachment(GetFollowCamera());
+
+	InterpComp2 = CreateDefaultSubobject<USceneComponent>("Interp Component 2");
+	InterpComp2->SetupAttachment(GetFollowCamera());
+
+	InterpComp3 = CreateDefaultSubobject<USceneComponent>("Interp Component 3");
+	InterpComp3->SetupAttachment(GetFollowCamera());
+
+	InterpComp4 = CreateDefaultSubobject<USceneComponent>("Interp Component 4");
+	InterpComp4->SetupAttachment(GetFollowCamera());
+
+	InterpComp5 = CreateDefaultSubobject<USceneComponent>("Interp Component 5");
+	InterpComp5->SetupAttachment(GetFollowCamera());
+
+	InterpComp6 = CreateDefaultSubobject<USceneComponent>("Interp Component 6");
+	InterpComp6->SetupAttachment(GetFollowCamera());
+
 }
 
 // Called when the game starts or when spawned
@@ -131,6 +159,8 @@ void ANiceCharacter::BeginPlay()
 	/** Call the Initialize ammo map */
 	InitializeAmmoMap();
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+	/** create Finterplocation structs for each interp each location. add to array */
+	InitializeInterpLocations();
 }
 
 // Called every frame
@@ -224,9 +254,7 @@ void ANiceCharacter::SelectButtonPressed()
 {
 	if (TraceHitItem) {
 		TraceHitItem->StartItemCurve(this);
-		if (TraceHitItem->GetPickupSound()) {
-			UGameplayStatics::PlaySound2D(this, TraceHitItem->GetPickupSound());
-		}
+		
 	}
 }
 
@@ -374,6 +402,15 @@ void ANiceCharacter::Jump()
 	}
 }
 
+void ANiceCharacter::ResetPickupSoundTimer()
+{
+	bShouldPlayPickupSound = true;
+}
+void ANiceCharacter::ResetEquipSoundTimer()
+{
+	bShouldPlayEquipSound = true;
+}
+
 void ANiceCharacter::InterpCapsuleHalfHeight(float DeltaTime)
 {
 	float TargetCapsuleHalfHeight{};
@@ -403,6 +440,27 @@ void ANiceCharacter::StopAiming()
 {
 	bAiming = false;
 	if (!bCrouching) GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+}
+
+void ANiceCharacter::PickupAmmo(AAmmo* Ammo)
+{
+	/** Check to see if ammomap contains ammo's ammotype */
+	if (AmmoMap.Find(Ammo->GetAmmoType())) {
+		/** Get amount of ammo in our ammomap for ammo's type */
+		int32 ammoCount{ AmmoMap[Ammo->GetAmmoType()] };
+		ammoCount += Ammo->GetItemCount();
+		/** Set the amount of ammo in the map for this type  */
+		AmmoMap[Ammo->GetAmmoType()] = ammoCount;
+	}
+
+	if (EquippedWeapon->GetAmmoType() == Ammo->GetAmmoType()) {
+
+		/** check to see if the gun is empty */
+		if (EquippedWeapon->GetAmmo() == 0) {
+			ReloadWeapon();
+		}
+	}
+	Ammo->Destroy();
 }
 
 void ANiceCharacter::FireWeapon()
@@ -681,23 +739,26 @@ void ANiceCharacter::IncrementOverlappedItemCount(int8 Amount)
 	}
 }
 
-FVector ANiceCharacter::GetCameraInterpolatedLocation(float DeltaTime)
-{
-	const FVector CameraWorldLocation{ GetFollowCamera()->GetComponentLocation() };
-	const FVector CameraForwards{ GetFollowCamera()->GetForwardVector() };
-	//	Desired = CameraWorldLocation + Forward * A + UP * B
-	return CameraWorldLocation + CameraForwards * CameraInterpDistance +
-		FVector(0.0f, 0.0f, CameraInterpElevation);
-}
+/** No longer needed; Aitem hasss GetInterpLocation */
+// FVector ANiceCharacter::GetCameraInterpolatedLocation()
+// {
+// 	const FVector CameraWorldLocation{ GetFollowCamera()->GetComponentLocation() };
+// 	const FVector CameraForwards{ GetFollowCamera()->GetForwardVector() };
+// 	//	Desired = CameraWorldLocation + Forward * A + UP * B
+// 	return CameraWorldLocation + CameraForwards * CameraInterpDistance +
+// 		FVector(0.0f, 0.0f, CameraInterpElevation);
+// }
 
 void ANiceCharacter::GetPickupItem(AItem* Item)
 {
-	if (Item->GetEquipSound()) {
-		UGameplayStatics::PlaySound2D(this, Item->GetEquipSound());
-	}
+	Item->PlayEquipSound();
 	if (auto Weapon = Cast<AWeapon>(Item)) {
 		SwapWeapon(Weapon);
 	}
+	if (auto ammo = Cast<AAmmo>(Item)) {
+		PickupAmmo(ammo);
+	}
+	//! start from here
 }
 
 void ANiceCharacter::ReloadButtonPressed()
@@ -803,5 +864,72 @@ void ANiceCharacter::CrouchButtonPressed()
 		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 		GetCharacterMovement()->GroundFriction = BaseGroundFriction;
 	}
+}
 
+void ANiceCharacter::InitializeInterpLocations()
+{
+	FInterpLocation weaponLocation{ WeaponInterpComp, 0 };
+	InterpLocations.Add(weaponLocation);
+
+	FInterpLocation inpterpLocation1{ InterpComp1, 0 };
+	InterpLocations.Add(inpterpLocation1);
+
+	FInterpLocation interpLocation2{ InterpComp2, 0 };
+	InterpLocations.Add(interpLocation2);
+
+	FInterpLocation interpLocation3{ InterpComp3, 0 };
+	InterpLocations.Add(interpLocation3);
+
+	FInterpLocation interpLocation4{ InterpComp4, 0 };
+	InterpLocations.Add(interpLocation4);
+
+	FInterpLocation interpLocation5{ InterpComp5, 0 };
+	InterpLocations.Add(interpLocation5);
+
+	FInterpLocation interpLocation6{ InterpComp6, 0 };
+	InterpLocations.Add(interpLocation6);
+
+}
+
+int32 ANiceCharacter::GetInterpLocationIndex()
+{
+	int32 LowestIndex = 1;
+	int32 lowestCount = INT_MAX;
+	for (int32 i = 1; i < InterpLocations.Num(); i++) {
+		if (InterpLocations[i].ItemCount < lowestCount) {
+			LowestIndex = i;
+			lowestCount = InterpLocations[i].ItemCount;
+		}
+	}
+	return LowestIndex;
+}
+
+FInterpLocation ANiceCharacter::GetInterpLocation(int32 Index)
+{
+	if (Index <= InterpLocations.Num()) {
+		return InterpLocations[Index];
+	}
+	return FInterpLocation();
+}
+
+void ANiceCharacter::IncrementInterpLocationItemCount(int32 Index, int32 Amount)
+{
+	if (Amount < -1 || Amount > 1) return;
+	if (InterpLocations.Num() >= Index) {
+		InterpLocations[Index].ItemCount += Amount;
+	}
+}
+
+void ANiceCharacter::StartPickupSoundTimer()
+{
+	bShouldPlayPickupSound = false;
+	GetWorldTimerManager().SetTimer(PickupSoundTimer, this, 
+		&ANiceCharacter::ResetPickupSoundTimer, PickupSoundResetTime);
+}
+
+void ANiceCharacter::StartEquipSoundTimer()
+{
+	bShouldPlayEquipSound = false;
+	GetWorldTimerManager().SetTimer(EquipSoundTimer, this,
+		&ANiceCharacter::ResetEquipSoundTimer, EquipSoundResetTime);
 }
