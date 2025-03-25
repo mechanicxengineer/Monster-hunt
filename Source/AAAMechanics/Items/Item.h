@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Engine//Datatable.h"
 #include "Item.generated.h"
 
 UENUM(BlueprintType)
@@ -39,6 +40,31 @@ enum class EItemType : uint8
 	EIT_MAX 				UMETA(DisplayName = "DefaultMax")
 };
 
+USTRUCT(BlueprintType)
+struct FItemRarityTable : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor GlowColor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor LightColor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor DarkColor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 NumberOfStars;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* IconBackground;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CustomDepthStencil;
+
+};
+
 UCLASS()
 class AAAMECHANICS_API AItem : public AActor
 {
@@ -69,7 +95,7 @@ class AAAMECHANICS_API AItem : public AActor
 	int32 ItemCount;
 	
 	/** Item rarity - determines number of stars in Pickup widget */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
 	EItemRarity ItemRarity;
 	
 	/** Array of stars to show on the Pickup widget */
@@ -126,48 +152,125 @@ class AAAMECHANICS_API AItem : public AActor
 	EItemType ItemType;
 	
 	/** Index of interp location this is interping to */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	int32 InterpLocIndex;
+	
+	/** Index for the material we would like to change at runtime */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	int32 MaterialIndex;
+	
+	/** Dynamic instance that we can change at runtime */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UMaterialInstanceDynamic* DynamicMaterialInstance;
+	
+	/** Material instance used with the dynamic material */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UMaterialInstance* MaterialInstance;
+	
+	bool bCanChangeCustomDepth;
+	
+	/** Curve to drive the dynamic meterial parameters */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class UCurveVector* PulseCurve;
+	/** Curve to drive the dynamic meterial parameters */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UCurveVector* InterpPulseCurve;
+	/**  */
+	FTimerHandle PulseTimer;
+	/** time for the pulse timer */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float PulseCurveTime;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float GlowAmount;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float FresnelExponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float FresnelReflectFraction;
+	
+	/** Icon Item for this item in the inventory */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* IconItem;
+
+	/** Ammo Item for this item in the inventory */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* AmmoItem;
+	
+	/** Slot in the Inventory array */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	int32 SlotIndex;
+	
+	/** true when the character is full */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	bool bCharacterInventoryFull;
+	
+	/** ITem rarity data table */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DataTable", meta = (AllowPrivateAccess = "true"))
+	class UDataTable* ItemRarityDataTable;
+	
+	/** Color in the glow material */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
+	FLinearColor GlowColor;
+	/** light color in the pickup widget */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
+	FLinearColor LightColor;
+	/** dark color in the pickup widget */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
+	FLinearColor DarkColor;
+	/** Number of stars in the pickup widget */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
+	int32 NumberOfStars;
+	/** Background icon for the inventory */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* IconBackground;
+
 public:	
 	// Sets default values for this actor's properties
 	AItem();
-
+	
 protected:
+	
+	virtual void OnConstruction(const FTransform& Transform) override;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 	/** Called when begin overlapping Areasphere */
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
-		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
 	/** Called when end overlapping AreaSphere */
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
-		int32 OtherBodyIndex);
-
+	int32 OtherBodyIndex);
+		
 	/** Set the active stars array of bools based on rarity */
 	void SetActiveStars();
 	/** Set the item properties (name, mesh, etc) based on the ItemState */
 	virtual void SetItemProperties(EItemState State);
-
+	
 	/** Called when iteminterping is finished */
 	void FinishInterping();
-
+	
 	/** Handles item interpolation when inerping is true */
 	void ItemInterp(float DeltaTime);
-
+	
 	/** Get interp location based on the item type */
 	FVector GetInterpLocation();
-
-	void PlayPickupSound();
 	
-
-public:	
+	void PlayPickupSound(bool bForcePlaySound = false);
+	virtual void InitializeCustomDepth();
+	
+	void StartPulseTimer();
+	void ResetPulseTimer();
+	void UpdatePulse();
+	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-
+	
+	
 	/*************	 GETTTERS	***************/
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
@@ -177,13 +280,25 @@ public:
 	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
 	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
 	FORCEINLINE int32 GetItemCount() const { return ItemCount; }
-
-	void PlayEquipSound();
-
+	FORCEINLINE int32 GetSlotIndex() { return SlotIndex; }
+	
+	void PlayEquipSound(bool bForcePlaySound = false);
+	
 	/*************	 SETTERS	***************/
 	void SetItemState(EItemState State);
+	void SetSlotIndex(int32 Index) { SlotIndex = Index; }
+	void SetCharacter(ANiceCharacter* Char) { Character = Char; }
+	void SetCharacterInventoryFull(bool bFull) { bCharacterInventoryFull = bFull; }
 	/******************* ***********************/
 	
 	/** Called from the Nicecharacter class */
-	void StartItemCurve(ANiceCharacter* Char);
+	void StartItemCurve(ANiceCharacter* Char, bool bForcePlaySound = false);
+	
+	virtual void EnableCustomDepth();
+	virtual void DisableCustomDepth();
+	
+	void EnableGlowMaterial();
+	void DisableGlowMaterial();
+	
+	
 };

@@ -27,7 +27,8 @@ UNiceAnimInstance::UNiceAnimInstance() :
     CharacterRotationLastFrame(FRotator::ZeroRotator),
     YawDelta(0.0f),
     RecoilWeight(1.0f),
-    bTurningInPlace(false)
+    bTurningInPlace(false),
+    bEquipping(false)
 {}
 
 void UNiceAnimInstance::NativeInitializeAnimation()
@@ -43,6 +44,7 @@ void UNiceAnimInstance::UpdateAnimationProperties(float DeltaSeconds)
     if (NiceCharacter) {
         bCrouching = NiceCharacter->GetCrouching();
         bReloading = NiceCharacter->GetCombatState() == ECombatState::ECS_Reloading;
+        bEquipping = NiceCharacter->GetCombatState() == ECombatState::ECS_Equipping;
 
         /** Get the speed of the character form velocity */
         FVector Velocity{ NiceCharacter->GetVelocity() };
@@ -128,20 +130,20 @@ void UNiceAnimInstance::TurnInPlace()
     }
     /** Set the recoil */
     if (bTurningInPlace) {
-        if (bReloading)
+        if (bReloading || bEquipping)
             RecoilWeight = 1.0f;
         else
             RecoilWeight = 0.0f;
     }
     else {  /** not turning in place */
         if (bCrouching) {
-            if (bReloading)
+            if (bReloading || bEquipping)
                 RecoilWeight = 1.0f;
             else
                 RecoilWeight = 0.1f;
         }
         else {
-            if (bAiming || bReloading)
+            if (bAiming || bReloading || bEquipping)
                 RecoilWeight = 1.0f;
             else
                 RecoilWeight = 0.5f;

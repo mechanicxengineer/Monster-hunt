@@ -39,7 +39,6 @@ protected:
 	UFUNCTION()
 	void AmmoSphereOverlap(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
 
 public:
 	AAmmo();
@@ -50,4 +49,7 @@ public:
 	FORCEINLINE EAmmoType GetAmmoType() { return AmmoType; }
 
 	/******************************************/
+
+	virtual void EnableCustomDepth() override;
+	virtual void DisableCustomDepth() override;
 };

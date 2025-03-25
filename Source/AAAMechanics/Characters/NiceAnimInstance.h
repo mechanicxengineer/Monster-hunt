@@ -95,6 +95,10 @@ class AAAMECHANICS_API UNiceAnimInstance : public UAnimInstance
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	bool bTurningInPlace;
 
+	/** true when Equipping */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	bool bEquipping;
+
 public:
 
 	UNiceAnimInstance();

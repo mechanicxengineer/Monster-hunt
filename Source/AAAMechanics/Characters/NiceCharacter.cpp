@@ -89,7 +89,9 @@ ANiceCharacter::ANiceCharacter() :
 	  bShouldPlayPickupSound(true),
 	  bShouldPlayEquipSound(true),
 	  PickupSoundResetTime(0.2f),
-	  EquipSoundResetTime(0.2f)
+	  EquipSoundResetTime(0.2f),
+	  /** Icon animation properties */
+	  HightlightSlot(-1)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -155,12 +157,18 @@ void ANiceCharacter::BeginPlay()
 	}
 	/** Spawn default weapon and equip it */
 	EquipWeapon(SpawnDefaultWeapon());
+	Inventory.Add(EquippedWeapon);
+	EquippedWeapon->SetSlotIndex(0);
+	EquippedWeapon->DisableCustomDepth();
+	EquippedWeapon->DisableGlowMaterial();
+	EquippedWeapon->SetCharacter(this);
 
 	/** Call the Initialize ammo map */
 	InitializeAmmoMap();
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	/** create Finterplocation structs for each interp each location. add to array */
 	InitializeInterpLocations();
+
 }
 
 // Called every frame
@@ -189,9 +197,38 @@ void ANiceCharacter::TraceForItem()
 		TraceUnderCrosshairs(ItemHitResult, HitLocation);
 		if (ItemHitResult.bBlockingHit) {
 			TraceHitItem = Cast<AItem>(ItemHitResult.Actor);
+			const auto* TraceHitWeapon = Cast<AWeapon>(TraceHitItem);
+			if (TraceHitWeapon) {
+				if (HightlightSlot == -1) {
+					/** Not currently highlight a slot; highlight one */
+					HighlightInventorySlot();
+				}
+			}
+			else {
+				/** is a slot being highlight? */
+				if (HightlightSlot != -1) {
+					/** Stop highlighting */
+					UnhighlightInventorySlot();
+				}
+			}
+
+			if (TraceHitItem && TraceHitItem->GetItemState() == EItemState::EIS_EQUIPINTERPING) {
+				TraceHitItem = nullptr;
+			}
+			
 			if (TraceHitItem && TraceHitItem->GetPickupWidget()) {
-				/** Show Item's visibility  */
+				/** Show Item's pickup widget  */
 				TraceHitItem->GetPickupWidget()->SetVisibility(true);
+				TraceHitItem->EnableCustomDepth();
+
+				if (Inventory.Num() >= INVENTORY_MAX_SIZE) {
+					/** Inventory is full */
+					TraceHitItem->SetCharacterInventoryFull(true);
+				}
+				else {
+				    /** Inventory has room */
+					TraceHitItem->SetCharacterInventoryFull(false);
+				}
 			}
 			/** We hit an AItem last frame */
 			if (TraceHitItemLastFrame) {
@@ -199,6 +236,7 @@ void ANiceCharacter::TraceForItem()
 					/** We are hitting a different aitem this frame from last frame */
 					/** Or AItem is null */
 					TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
+					TraceHitItemLastFrame->DisableCustomDepth();
 				}
 			}
 			/** store a reference to the item for next frame */
@@ -211,6 +249,7 @@ void ANiceCharacter::TraceForItem()
 		  * Item last frame should not show widget
 		  */
 		TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
+		TraceHitItemLastFrame->DisableCustomDepth();
 	}
 }
 
@@ -224,7 +263,7 @@ AWeapon* ANiceCharacter::SpawnDefaultWeapon()
 	return nullptr;
 }
 
-void ANiceCharacter::EquipWeapon(AWeapon* WeaponToEquip)
+void ANiceCharacter::EquipWeapon(AWeapon* WeaponToEquip, bool bSwapping)
 {
 	if (WeaponToEquip) {
 		/** Get the hand socket */
@@ -233,6 +272,15 @@ void ANiceCharacter::EquipWeapon(AWeapon* WeaponToEquip)
 			/** Attach the weapon to the hand socket */
 			RightHandSocket->AttachActor(WeaponToEquip, GetMesh());
 		}
+
+		if (EquippedWeapon == nullptr) {
+			/** -1 == no equippedWeapon yet, No need to reverse the icon animation */
+			OnEquipItem.Broadcast(-1, WeaponToEquip->GetSlotIndex());
+		}
+		else if (!bSwapping) {
+			OnEquipItem.Broadcast(EquippedWeapon->GetSlotIndex(), WeaponToEquip->GetSlotIndex());
+		}
+
 		/** Set the equipped weapon to the weapon that was passed in */
 		EquippedWeapon = WeaponToEquip;
 		EquippedWeapon->SetItemState(EItemState::EIS_EQUIPPED);
@@ -252,9 +300,10 @@ void ANiceCharacter::DropWeapon()
 
 void ANiceCharacter::SelectButtonPressed()
 {
+	if (CombatState != ECombatState::ECS_Unoccupied) return;
 	if (TraceHitItem) {
-		TraceHitItem->StartItemCurve(this);
-		
+		TraceHitItem->StartItemCurve(this, true);
+		TraceHitItem = nullptr;
 	}
 }
 
@@ -265,8 +314,12 @@ void ANiceCharacter::SelectButtonReleased()
 
 void ANiceCharacter::SwapWeapon(AWeapon* WeaponToSwap)
 {
+	if (Inventory.Num() - 1 >= EquippedWeapon->GetSlotIndex()) {
+		Inventory[EquippedWeapon->GetSlotIndex()] = WeaponToSwap;
+		WeaponToSwap->SetSlotIndex(EquippedWeapon->GetSlotIndex());
+	}
 	DropWeapon();
-	EquipWeapon(WeaponToSwap);
+	EquipWeapon(WeaponToSwap, true);
 	TraceHitItem = nullptr;
 	TraceHitItemLastFrame = nullptr;
 }
@@ -327,6 +380,14 @@ void ANiceCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("ReloadButton", IE_Pressed, this, &ANiceCharacter::ReloadButtonPressed);
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ANiceCharacter::CrouchButtonPressed);
+	
+	PlayerInputComponent->BindAction("FKey", IE_Pressed, this, &ANiceCharacter::FKeyPressed);
+	PlayerInputComponent->BindAction("1Key", IE_Pressed, this, &ANiceCharacter::OneKeyPressed);
+	PlayerInputComponent->BindAction("2Key", IE_Pressed, this, &ANiceCharacter::TwoKeyPressed);
+	PlayerInputComponent->BindAction("3Key", IE_Pressed, this, &ANiceCharacter::ThreeKeyPressed);
+	PlayerInputComponent->BindAction("4Key", IE_Pressed, this, &ANiceCharacter::FourKeyPressed);
+	PlayerInputComponent->BindAction("5Key", IE_Pressed, this, &ANiceCharacter::FiveKeyPressed);
+
 }
 
 void ANiceCharacter::MoveForward(float _value)
@@ -351,9 +412,8 @@ void ANiceCharacter::MoveRight(float _value)
 		const FVector Direction{ FRotationMatrix{YawRotation}.GetUnitAxis(EAxis::Y) };
 		AddMovementInput(Direction, _value);
 	}
-
 }
-
+ 
 void ANiceCharacter::TurnAtRate(float rate)
 {
 	/** calculate delta for this frame from the rate information */
@@ -684,7 +744,8 @@ void ANiceCharacter::StartFireTimer()
 
 void ANiceCharacter::AutoFireReset()
 {
-	CombatState = ECombatState::ECS_Unoccupied;
+	//CombatState = ECombatState::ECS_Unoccupied;
+	SetUnoccupied();
 	if (WeaponHasAmmo()) {
 		if (bFireButtonPressed) {
 			FireWeapon();
@@ -739,7 +800,7 @@ void ANiceCharacter::IncrementOverlappedItemCount(int8 Amount)
 	}
 }
 
-/** No longer needed; Aitem hasss GetInterpLocation */
+/** No longer needed; AItem has GetInterpLocation */
 // FVector ANiceCharacter::GetCameraInterpolatedLocation()
 // {
 // 	const FVector CameraWorldLocation{ GetFollowCamera()->GetComponentLocation() };
@@ -753,12 +814,18 @@ void ANiceCharacter::GetPickupItem(AItem* Item)
 {
 	Item->PlayEquipSound();
 	if (auto Weapon = Cast<AWeapon>(Item)) {
-		SwapWeapon(Weapon);
+		if (Inventory.Num() < INVENTORY_MAX_SIZE) {
+			Weapon->SetSlotIndex(Inventory.Num());
+			Inventory.Add(Weapon);
+			Weapon->SetItemState(EItemState::EIS_PICKEDUP);
+		}
+		else {	/** Inventory is full; swap with equipped weapon */
+			SwapWeapon(Weapon);
+		}
 	}
 	if (auto ammo = Cast<AAmmo>(Item)) {
 		PickupAmmo(ammo);
 	}
-	//! start from here
 }
 
 void ANiceCharacter::ReloadButtonPressed()
@@ -771,7 +838,7 @@ void ANiceCharacter::ReloadWeapon()
 	if (CombatState != ECombatState::ECS_Unoccupied) return;
 	if (EquippedWeapon == nullptr) return;
 	
-	//!	do we have ammo of the correct type?
+	//	do we have ammo of the correct type?
 	if (CarryingAmmo() && !EquippedWeapon->ClipIsFull()) {
 		
 		if (bAiming) StopAiming();
@@ -787,7 +854,8 @@ void ANiceCharacter::ReloadWeapon()
 void ANiceCharacter::FinishReloading()
 {
 	/** update the combat state */
-	CombatState = ECombatState::ECS_Unoccupied;
+	//CombatState = ECombatState::ECS_Unoccupied;
+	SetUnoccupied();
 	if (bAimingButtonPressed) {
 		Aim();
 	}
@@ -891,11 +959,100 @@ void ANiceCharacter::InitializeInterpLocations()
 
 }
 
+void ANiceCharacter::FKeyPressed()
+{
+	if (EquippedWeapon->GetSlotIndex() == 0) return;
+	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 0);
+}
+
+void ANiceCharacter::OneKeyPressed()
+{
+	if (EquippedWeapon->GetSlotIndex() == 1) return;
+	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 1);
+}
+
+void ANiceCharacter::TwoKeyPressed()
+{
+	if (EquippedWeapon->GetSlotIndex() == 2) return;
+	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 2);
+}
+
+void ANiceCharacter::ThreeKeyPressed()
+{
+	if (EquippedWeapon->GetSlotIndex() == 3) return;
+	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 3);
+}
+
+void ANiceCharacter::FourKeyPressed()
+{
+	if (EquippedWeapon->GetSlotIndex() == 4) return;
+	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 4);
+}
+
+void ANiceCharacter::FiveKeyPressed()
+{
+	if (EquippedWeapon->GetSlotIndex() == 5) return;
+	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 5);
+}
+
+void ANiceCharacter::ExchangeInventoryItems(int32 CurrentItem, int32 NewItemIndex)
+{
+	if ((CurrentItem != NewItemIndex) && (NewItemIndex < Inventory.Num()) && 
+		(CombatState == ECombatState::ECS_Unoccupied || CombatState == ECombatState::ECS_Equipping)) 
+	{
+		auto OldEquippedItem = EquippedWeapon;
+		auto NewWeapon = Cast<AWeapon>(Inventory[NewItemIndex]);
+		EquipWeapon(NewWeapon);
+	
+		OldEquippedItem->SetItemState(EItemState::EIS_PICKEDUP);
+		NewWeapon->SetItemState(EItemState::EIS_EQUIPPED);
+	
+		CombatState = ECombatState::ECS_Equipping;
+		if (auto* AnimInstance = GetMesh()->GetAnimInstance()) {
+			if (EquipMontage) {
+				AnimInstance->Montage_Play(EquipMontage, 1.0f);
+				AnimInstance->Montage_JumpToSection(FName("Equip"));
+			}
+		}
+		NewWeapon->PlayEquipSound(true);
+	}
+}
+
+int32 ANiceCharacter::GetEmptyInventorySlot()
+{
+	for (int32 i = 0; i < Inventory.Num(); i++) {
+		if (Inventory[i] == nullptr) {
+			return i;
+		}
+	}
+	if (Inventory.Num() < INVENTORY_MAX_SIZE) {
+		return Inventory.Num();
+	}
+	return -1;	//* Inventory is full
+}
+
+void ANiceCharacter::HighlightInventorySlot()
+{
+	const int32 EmptySlot{ GetEmptyInventorySlot() };
+	OnHighlightSlot.Broadcast(EmptySlot, true);
+	HightlightSlot = EmptySlot;
+}
+
+void ANiceCharacter::UnhighlightInventorySlot()
+{
+	OnHighlightSlot.Broadcast(HightlightSlot, false);
+	HightlightSlot = -1;
+}
+
 int32 ANiceCharacter::GetInterpLocationIndex()
 {
+	// Initialize the lowest index to 1
 	int32 LowestIndex = 1;
+	// Initialize the lowest count to the maximum integer value
 	int32 lowestCount = INT_MAX;
+	// Loop through the InterpLocations array
 	for (int32 i = 1; i < InterpLocations.Num(); i++) {
+		// If the current item count is less than the lowest count
 		if (InterpLocations[i].ItemCount < lowestCount) {
 			LowestIndex = i;
 			lowestCount = InterpLocations[i].ItemCount;
@@ -932,4 +1089,9 @@ void ANiceCharacter::StartEquipSoundTimer()
 	bShouldPlayEquipSound = false;
 	GetWorldTimerManager().SetTimer(EquipSoundTimer, this,
 		&ANiceCharacter::ResetEquipSoundTimer, EquipSoundResetTime);
+}
+
+void ANiceCharacter::SetUnoccupied() 
+{
+	CombatState = ECombatState::ECS_Unoccupied;
 }

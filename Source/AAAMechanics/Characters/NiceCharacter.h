@@ -13,6 +13,7 @@ enum class ECombatState  : uint8
 	ECS_Unoccupied						UMETA(DisplayName="Unoccupied"),
 	ECS_FireTimerInProgress 			UMETA(DisplayName="FireTimerInProgress"),
 	ECS_Reloading						UMETA(DisplayName="Reloading"),
+	ECS_Equipping						UMETA(DisplayName="Equipping"),
 
 	ECS_Max 							UMETA(DisplayName="DefaultMax")
 };
@@ -31,6 +32,8 @@ struct FInterpLocation
 	int32 ItemCount;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipItemDelegate, int32, CurrentSlotIndex, int32, NewSlotIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHighlightIconDelegate, int32, SlotIndex, bool, bStartAnimation);
 
 UCLASS()
 class AAAMECHANICS_API ANiceCharacter : public ACharacter
@@ -102,6 +105,10 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	/** Montage to play when the character fires */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class UAnimMontage* HipFireMontage;
+
+	/** Montage to play when the character fires */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class UAnimMontage* EquipMontage;
 
 	/** Wheather or not the character is aiming */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
@@ -266,7 +273,29 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	/** Time to wait before we can play another equip sound */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items", meta = (AllowPrivateAccess = "true"))
 	float EquipSoundResetTime;
+	
+	/** An Array items for our inventory */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TArray<AItem*> Inventory;
+	
+	const int32 INVENTORY_MAX_SIZE{ 6 };
+	
+	/** the index for the currenty highlighted slot */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	int32 HighlightedSlotIndex;
+	
+	/** Delegate for sending slot information to inventoryBar when equipping */
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", meta = (AllowPrivateAccess = "true"))
+	FOnEquipItemDelegate OnEquipItem;
+	
+	/** Delegate for sending slot information for playing the icon anations */
+	UPROPERTY(BlueprintAssignable, Category = "Delegates", meta = (AllowPrivateAccess = "true"))
+	FHighlightIconDelegate OnHighlightSlot;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	int32 HightlightSlot;
 
+	/** Functions  */
 	void ResetPickupSoundTimer();
 	void ResetEquipSoundTimer();
 
@@ -335,7 +364,7 @@ protected:
 	/** Spawns a default weapon and equips it */
 	AWeapon* SpawnDefaultWeapon();
 	/** Equip the weapon and attaches it to the mesh */
-	void EquipWeapon(AWeapon* weaponToEquip);
+	void EquipWeapon(AWeapon* weaponToEquip, bool bSwapping = false);
 	/** Detach weapon and let it fall to the ground */
 	void DropWeapon();
 
@@ -371,6 +400,16 @@ protected:
 	void PickupAmmo(class AAmmo* Ammo);
 	void InitializeInterpLocations();
 	
+	void FKeyPressed();
+	void OneKeyPressed();
+	void TwoKeyPressed();
+	void ThreeKeyPressed();
+	void FourKeyPressed();
+	void FiveKeyPressed();
+
+	void ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex);
+	int32 GetEmptyInventorySlot();
+
 
 public:	
 	// Called every frame
@@ -404,6 +443,9 @@ public:
 	
 	void StartPickupSoundTimer();
 	void StartEquipSoundTimer();
+
+	void HighlightInventorySlot();
+	void UnhighlightInventorySlot();
 	
 	/*************	 GETTTERS	***************/
 	/**	Returns CameraBoom subobject */
@@ -422,5 +464,5 @@ public:
 	
 
 	/*****************************************/
-	
+	void SetUnoccupied();
 };
