@@ -86,14 +86,6 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	float MouseAimingLookUpRate;
 
 
-	/** Sound to play when the character fires */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class USoundCue* FireSound;
-
-	/** Particle system to spawn when the character fires */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class UParticleSystem* MuzzleFlash;
-	
 	/** Impact particle to spawn when we hit a surface */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class UParticleSystem* ImapctParticles;
@@ -146,8 +138,6 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	bool bFireButtonPressed;
 	/** True when we can fire, False when waiting for the timer */
 	bool bShouldFire;
-	/** Rate of automatic gunfire */
-	float AutomaticFireRate;
 
 	/** Timer handle for managing the fire rate */
 	FTimerHandle CrosshairShootingResetTimer;
@@ -163,7 +153,7 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	class AItem* TraceHitItemLastFrame;
 	
 	/** Currently equipped weapon */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class AWeapon* EquippedWeapon;
 	
 	/** Set this in Blueprint for the default weapon class */
@@ -459,10 +449,14 @@ public:
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 	FORCEINLINE bool GetCrouching() const { return bCrouching; }
+	
+	FORCEINLINE AWeapon* GetEquippedWeapon() const { return EquippedWeapon; }
+
 	FORCEINLINE bool ShouldPlayPickupSound() const { return bShouldPlayEquipSound; }
 	FORCEINLINE bool ShouldPlayEquipSound() const { return bShouldPlayPickupSound; }
 	
 
 	/*****************************************/
 	void SetUnoccupied();
+	void ResetAiming();
 };

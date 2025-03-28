@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "..//WeaponType.h"
 #include "NiceAnimInstance.generated.h"
 
 class ANiceCharacter;
@@ -46,7 +47,7 @@ class AAAMECHANICS_API UNiceAnimInstance : public UAnimInstance
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float LastMovementOffsetYaw;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	bool bAiming;
 	
 	/** Yaw of the Character this frame, only update when standing still and not in air */
@@ -98,9 +99,16 @@ class AAAMECHANICS_API UNiceAnimInstance : public UAnimInstance
 	/** true when Equipping */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	bool bEquipping;
+	
+	/** Weapon type for the current equipped weapon */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	EWeaponType EquippedWeaponType;
+	
+	/** True when not reloading or equiping */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	bool bShouldUseFABRIK;
 
 public:
-
 	UNiceAnimInstance();
 	
 	/**	Initializes the animation instance */

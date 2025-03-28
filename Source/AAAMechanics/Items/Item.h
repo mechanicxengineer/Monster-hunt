@@ -191,7 +191,6 @@ class AAAMECHANICS_API AItem : public AActor
 	/** Icon Item for this item in the inventory */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* IconItem;
-
 	/** Ammo Item for this item in the inventory */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* AmmoItem;
@@ -281,14 +280,32 @@ public:
 	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
 	FORCEINLINE int32 GetItemCount() const { return ItemCount; }
 	FORCEINLINE int32 GetSlotIndex() { return SlotIndex; }
+	FORCEINLINE UMaterialInstance* GetMaterialInstance() { return MaterialInstance; }
+	FORCEINLINE UMaterialInstanceDynamic* GetDynamicMaterialInstance() { return DynamicMaterialInstance; }
+	FORCEINLINE FLinearColor GetGlowColor() const { return GlowColor; }
+	FORCEINLINE int32 GetMaterialIndex() const { return MaterialIndex; }
+
 	
 	void PlayEquipSound(bool bForcePlaySound = false);
 	
 	/*************	 SETTERS	***************/
-	void SetItemState(EItemState State);
-	void SetSlotIndex(int32 Index) { SlotIndex = Index; }
-	void SetCharacter(ANiceCharacter* Char) { Character = Char; }
-	void SetCharacterInventoryFull(bool bFull) { bCharacterInventoryFull = bFull; }
+	
+	FORCEINLINE void SetPickupSound(USoundCue* Sound) { PickupSound = Sound; }
+	FORCEINLINE void SetEquipSound(USoundCue* Sound) { EquipSound = Sound; }
+
+	FORCEINLINE void SetItemState(EItemState State);
+	FORCEINLINE void SetSlotIndex(int32 Index) { SlotIndex = Index; }
+	FORCEINLINE void SetCharacter(ANiceCharacter* Char) { Character = Char; }
+	FORCEINLINE void SetCharacterInventoryFull(bool bFull) { bCharacterInventoryFull = bFull; }
+	FORCEINLINE void SetItemName(FString Name) { ItemName = Name; }
+	
+	/** Set Item icon for the inventory */
+	FORCEINLINE void SetIconItem(UTexture2D* Icon) { IconItem = Icon; }
+	/** set ammo icon for the pickup widget */
+	FORCEINLINE void SetAmmoIcon(UTexture2D* Icon) { AmmoItem = Icon; }
+	FORCEINLINE void SetMaterialInstance(UMaterialInstance* Instance) { MaterialInstance = Instance; }
+	FORCEINLINE void SetDynamicMaterialInstance(UMaterialInstanceDynamic* Instance) { DynamicMaterialInstance = Instance; }
+	FORCEINLINE void SetMaterialIndex(int32 Index) { MaterialIndex = Index; }
 	/******************* ***********************/
 	
 	/** Called from the Nicecharacter class */

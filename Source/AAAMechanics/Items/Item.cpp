@@ -267,12 +267,11 @@ void AItem::SetItemProperties(EItemState State)
 			ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 			ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			/** Set areasphere properties */
-			AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-			AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+			AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			/** Set collision box properties */
 			CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-			CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-			CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			
 			break;
 		case EItemState::EIS_PICKEDUP:
@@ -284,12 +283,11 @@ void AItem::SetItemProperties(EItemState State)
 			ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 			ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			/** Set areasphere properties */
-			AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-			AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+			AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			/** Set collision box properties */
 			CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-			CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-			CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			break;
 	}
 }

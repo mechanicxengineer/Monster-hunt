@@ -60,7 +60,6 @@ ANiceCharacter::ANiceCharacter() :
 	  //	Automatic fire variables
 	  bFireButtonPressed(false),
 	  bShouldFire(true),
-	  AutomaticFireRate(0.1f),
 	  //	Timer variables
 	  ShootTimeDuration(0.05f),
 	  bFiringBullet(false),
@@ -536,14 +535,19 @@ void ANiceCharacter::FireWeapon()
 		EquippedWeapon->DecreamentAmmo();
 
 		StartFireTimer();
+
+		if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol) {
+			/** Start moving slide timer */
+			EquippedWeapon->StartSlideTimer();
+		}
 	}
 }
 
 void ANiceCharacter::PlayFireSound()
 {
 	/** Play Fire Sound */
-	if (FireSound) {
-		UGameplayStatics::PlaySound2D(this, FireSound);
+	if (EquippedWeapon->GetFireSound()) {
+		UGameplayStatics::PlaySound2D(this, EquippedWeapon->GetFireSound());
 	}
 }
 
@@ -553,9 +557,10 @@ void ANiceCharacter::SendBullet()
 	const USkeletalMeshSocket *BarrelSocket{
 		EquippedWeapon->GetItemMesh()->GetSocketByName("barrelSocket")};
 		if (BarrelSocket) {
-			const FTransform SocketTransform{BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh())};
-			if (MuzzleFlash) {
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+			const FTransform SocketTransform{ BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh()) };
+			if (EquippedWeapon->GetMuzzleFlash()) {
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EquippedWeapon->GetMuzzleFlash(), 
+					SocketTransform);
 			}
 			
 			FVector BeamEnd;
@@ -643,7 +648,8 @@ bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVe
 void ANiceCharacter::AimingButtonPressed()
 {
 	bAimingButtonPressed = true;
-	if (CombatState != ECombatState::ECS_Reloading) {
+	if (CombatState != ECombatState::ECS_Reloading && 
+		CombatState != ECombatState::ECS_Equipping) {
 		Aim();
 	}
 }
@@ -736,18 +742,19 @@ void ANiceCharacter::FireButtonReleased()
 
 void ANiceCharacter::StartFireTimer()
 {
+	if (EquippedWeapon == nullptr) return;
 	CombatState = ECombatState::ECS_FireTimerInProgress;
 
 	GetWorldTimerManager().SetTimer(AutoFireTimer, this, 
-		&ANiceCharacter::AutoFireReset, AutomaticFireRate);
+		&ANiceCharacter::AutoFireReset, EquippedWeapon->GetAutoRateOfFire());
 }
 
 void ANiceCharacter::AutoFireReset()
 {
-	//CombatState = ECombatState::ECS_Unoccupied;
 	SetUnoccupied();
+	if (EquippedWeapon == nullptr) return;
 	if (WeaponHasAmmo()) {
-		if (bFireButtonPressed) {
+		if (bFireButtonPressed && EquippedWeapon->GetAutomatic()) {
 			FireWeapon();
 		}
 	}
@@ -1000,6 +1007,8 @@ void ANiceCharacter::ExchangeInventoryItems(int32 CurrentItem, int32 NewItemInde
 	if ((CurrentItem != NewItemIndex) && (NewItemIndex < Inventory.Num()) && 
 		(CombatState == ECombatState::ECS_Unoccupied || CombatState == ECombatState::ECS_Equipping)) 
 	{
+		if (bAiming) StopAiming();
+
 		auto OldEquippedItem = EquippedWeapon;
 		auto NewWeapon = Cast<AWeapon>(Inventory[NewItemIndex]);
 		EquipWeapon(NewWeapon);
@@ -1094,4 +1103,11 @@ void ANiceCharacter::StartEquipSoundTimer()
 void ANiceCharacter::SetUnoccupied() 
 {
 	CombatState = ECombatState::ECS_Unoccupied;
+}
+
+void ANiceCharacter::ResetAiming()
+{
+	if (bAimingButtonPressed) {
+		Aim();
+	}
 }

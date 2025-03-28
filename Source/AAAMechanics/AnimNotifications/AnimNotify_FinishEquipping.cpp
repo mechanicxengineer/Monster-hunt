@@ -13,6 +13,7 @@ void UAnimNotify_FinishEquipping::Notify(USkeletalMeshComponent* MeshComp, UAnim
 			if (auto* NiceCharacter = Cast<ANiceCharacter>(Owner)) {
                 //show("FinishEquipping"); //! Debug
 				NiceCharacter->SetUnoccupied();
+                NiceCharacter->ResetAiming();
              }
         }
     }

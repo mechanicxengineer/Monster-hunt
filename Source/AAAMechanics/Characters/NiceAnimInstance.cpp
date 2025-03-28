@@ -5,6 +5,7 @@
 #include "NiceCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "..//Items//Weapons//Weapon.h"
 
 //  Custom includes
 #include "..//DebugMacros.h"
@@ -28,7 +29,9 @@ UNiceAnimInstance::UNiceAnimInstance() :
     YawDelta(0.0f),
     RecoilWeight(1.0f),
     bTurningInPlace(false),
-    bEquipping(false)
+    bEquipping(false),
+    EquippedWeaponType(EWeaponType::EWT_Max),
+    bShouldUseFABRIK(false)
 {}
 
 void UNiceAnimInstance::NativeInitializeAnimation()
@@ -45,6 +48,9 @@ void UNiceAnimInstance::UpdateAnimationProperties(float DeltaSeconds)
         bCrouching = NiceCharacter->GetCrouching();
         bReloading = NiceCharacter->GetCombatState() == ECombatState::ECS_Reloading;
         bEquipping = NiceCharacter->GetCombatState() == ECombatState::ECS_Equipping;
+
+        bShouldUseFABRIK = NiceCharacter->GetCombatState() == ECombatState::ECS_Unoccupied ||
+            NiceCharacter->GetCombatState() == ECombatState::ECS_FireTimerInProgress;
 
         /** Get the speed of the character form velocity */
         FVector Velocity{ NiceCharacter->GetVelocity() };
@@ -78,6 +84,10 @@ void UNiceAnimInstance::UpdateAnimationProperties(float DeltaSeconds)
         }
         else {
             OffsetState = EOffsetState::EOS_Hip;
+        }
+        //  Check if nice character has a valid Equipped weapon
+        if (NiceCharacter->GetEquippedWeapon()) {
+            EquippedWeaponType = NiceCharacter->GetEquippedWeapon()->GetWeaponType();
         }
     }
     TurnInPlace();
