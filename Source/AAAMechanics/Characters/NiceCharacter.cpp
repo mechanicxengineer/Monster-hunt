@@ -14,6 +14,7 @@
 #include "Sound//SoundCue.h"
 
 #include "Particles//ParticleSystemComponent.h"
+#include "PhysicalMaterials//PhysicalMaterial.h"
 
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
@@ -24,6 +25,7 @@
 #include "..//Items//Item.h"
 #include "..//Items//Ammo.h"
 #include "..//Items//Weapons//Weapon.h"
+#include "..//AAAMechanics.h"
 
 //	Debug includes
 #include "..//Common//advlog.h"
@@ -1053,6 +1055,18 @@ void ANiceCharacter::UnhighlightInventorySlot()
 	HightlightSlot = -1;
 }
 
+EPhysicalSurface ANiceCharacter::GetSurfaceType()
+{
+	FHitResult hitResult;
+	const FVector Start{ GetActorLocation() };
+	const FVector End{ Start + FVector(0.f, 0.f, -400.0f) };
+	FCollisionQueryParams QuaryParams;
+	QuaryParams.bReturnPhysicalMaterial = true;
+	GetWorld()->LineTraceSingleByChannel(hitResult, Start, End, ECollisionChannel::ECC_Visibility, 
+		QuaryParams);
+	return UPhysicalMaterial::DetermineSurfaceType(hitResult.PhysMaterial.Get());
+}
+ 
 int32 ANiceCharacter::GetInterpLocationIndex()
 {
 	// Initialize the lowest index to 1

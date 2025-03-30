@@ -433,9 +433,12 @@ public:
 	
 	void StartPickupSoundTimer();
 	void StartEquipSoundTimer();
-
+	
 	void HighlightInventorySlot();
 	void UnhighlightInventorySlot();
+	
+	UFUNCTION(BlueprintCallable)
+	EPhysicalSurface GetSurfaceType();
 	
 	/*************	 GETTTERS	***************/
 	/**	Returns CameraBoom subobject */

@@ -15,6 +15,7 @@ public class AAAMechanics : ModuleRules
 			"InputCore", 
 			"HeadMountedDisplay",
 			"UMG",
+			"PhysicsCore"
 			 });
 	}
 }
