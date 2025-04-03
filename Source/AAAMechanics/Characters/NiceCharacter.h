@@ -333,7 +333,7 @@ protected:
     void PlayGunFireMontage();
     void SendBullet();
     void PlayFireSound();
-    bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
+    bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FHitResult& OutHitResult);
 	/** Set bAiming to true of false with button press */
 	void AimingButtonPressed();
 	void AimingButtonReleased();

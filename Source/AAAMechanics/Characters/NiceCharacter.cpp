@@ -25,6 +25,8 @@
 #include "..//Items//Item.h"
 #include "..//Items//Ammo.h"
 #include "..//Items//Weapons//Weapon.h"
+#include "..//Interfaces//BulletHItInterface.h"
+#include "..//Enemy//Enemy.h"
 #include "..//AAAMechanics.h"
 
 //	Debug includes
@@ -558,23 +560,54 @@ void ANiceCharacter::SendBullet()
 	/** Send Bullet */
 	const USkeletalMeshSocket *BarrelSocket{
 		EquippedWeapon->GetItemMesh()->GetSocketByName("barrelSocket")};
-		if (BarrelSocket) {
-			const FTransform SocketTransform{ BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh()) };
-			if (EquippedWeapon->GetMuzzleFlash()) {
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EquippedWeapon->GetMuzzleFlash(), 
-					SocketTransform);
+	if (BarrelSocket) {
+		const FTransform SocketTransform{ BarrelSocket->GetSocketTransform(EquippedWeapon->GetItemMesh()) };
+		if (EquippedWeapon->GetMuzzleFlash()) {
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EquippedWeapon->GetMuzzleFlash(), 
+				SocketTransform);
+		}
+		
+		FHitResult BeamHitResult;
+		bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamHitResult);
+		if (bBeamEnd) {
+			/** Does hit actor Implement BulletHitInterface */
+			if (BeamHitResult.Actor.IsValid()) {
+				IBulletHitInterface* BulletHitInterface{ Cast<IBulletHitInterface>(BeamHitResult.Actor.Get()) };
+				if (BulletHitInterface) {
+					BulletHitInterface->BulletHit_Implementation(BeamHitResult);
+				}
+
+				if (AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get())) {
+					int32 Damage{ 0 };
+					if (BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone()) {
+						/** Head shot */
+						Damage = EquippedWeapon->GetHeadShotDamage();
+						UGameplayStatics::ApplyDamage(HitEnemy, Damage, 
+							GetController(), this, UDamageType::StaticClass());
+							HitEnemy->ShowDamageNumber(Damage, BeamHitResult.Location, true);
+					}
+					else {
+						/** Body shot */
+						Damage = EquippedWeapon->GetDamage();
+						UGameplayStatics::ApplyDamage(HitEnemy, Damage, 
+							GetController(), this, UDamageType::StaticClass());
+							HitEnemy->ShowDamageNumber(Damage, BeamHitResult.Location, false);
+					}
+
+				}
 			}
-			
-			FVector BeamEnd;
-			bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEnd);
-			if (bBeamEnd) {
-			if (ImapctParticles) {
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImapctParticles, BeamEnd);
+			else {
+				/** Spawn default particles */
+				if (ImapctParticles) {
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImapctParticles,
+				BeamHitResult.Location);
+				}
 			}
-			
-			UParticleSystemComponent *Beam{UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform)};
+
+			UParticleSystemComponent *Beam{ UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, 
+				SocketTransform) };
 			if (Beam) {
-				Beam->SetVectorParameter(FName("Target"), BeamEnd);
+				Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
 			}
 		}
 	}
@@ -590,10 +623,11 @@ void ANiceCharacter::PlayGunFireMontage()
 	}
 }
 
-bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVector &OutBeamLocation)
+bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FHitResult &OutHitResult)
 {
 	/** Check for crosshair trace hit */
 	FHitResult CrosshairHitResult;
+	FVector OutBeamLocation;
 	bool bCrosshairHit = TraceUnderCrosshairs(CrosshairHitResult, OutBeamLocation);
 	if (bCrosshairHit) {
 		/** Tentative beam location - still need to trance from gun */
@@ -602,17 +636,16 @@ bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FVe
 	else {	//	no crosshair trace hit
 		//	Outbeantrance is the end location for the line trance
 	}
-	//	Perform a second trace, this time from the gun barrel
-	FHitResult WeaponHit;
+	/** Perform a speed trane, this time from the gun barrel */
 	const FVector WeaponTraceStart{ MuzzleSocketLocation };
 	const FVector StartToEnd{ OutBeamLocation - MuzzleSocketLocation };
 	const FVector WeaponTraceEnd{ MuzzleSocketLocation + StartToEnd * 1.25f };
-	GetWorld()->LineTraceSingleByChannel(WeaponHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
-	if (WeaponHit.bBlockingHit) {				//	object between barrel and beam end point ?	
-		OutBeamLocation = WeaponHit.Location;
-		return true;
+	GetWorld()->LineTraceSingleByChannel(OutHitResult, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+	if (!OutHitResult.bBlockingHit) {				//	object between barrel and beam end point ?	
+		OutHitResult.Location = OutBeamLocation;
+		return false;
 	}
-	return false;
+	return true;
 
 	/** Get current size of the viewport */
 	FVector2D ViewportSize;

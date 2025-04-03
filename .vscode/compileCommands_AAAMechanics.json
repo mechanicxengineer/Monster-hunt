@@ -208,5 +208,15 @@
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Items\\\\Weapons\\\\Weapon.h",
 		"command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_AAAMechanics\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Enemy\\\\Enemy.cpp",
+		"command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_AAAMechanics\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Enemy\\\\Enemy.h",
+		"command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_AAAMechanics\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	}
 ]
