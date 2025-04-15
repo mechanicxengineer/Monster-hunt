@@ -8,14 +8,16 @@ public class AAAMechanics : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { 
+		PublicDependencyModuleNames.AddRange(new string[] {
 			"Core", 
-			"CoreUObject", 
-			"Engine", 
-			"InputCore", 
+			"CoreUObject",
+			"Engine",
+			"InputCore",
 			"HeadMountedDisplay",
 			"UMG",
-			"PhysicsCore"
-			 });
+			"PhysicsCore",
+			"NavigationSystem",
+			"AIModule"
+			});
 	}
 }

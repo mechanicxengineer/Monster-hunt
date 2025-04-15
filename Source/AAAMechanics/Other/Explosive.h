@@ -19,6 +19,14 @@ class AAAMECHANICS_API AExplosive : public AActor, public IBulletHitInterface
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class USoundCue* ImpactSound;
 
+	/** Mesh for the explosive */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* ExplosiveMesh;
+	
+	/** used to dertermine what actor overlap during explosion */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* OverlapSphere;
+
 public:	
 	AExplosive();
 

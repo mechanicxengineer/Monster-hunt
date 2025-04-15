@@ -9,6 +9,16 @@
 #include "Engine//DataTable.h"
 #include "Weapon.generated.h"
 
+USTRUCT(BlueprintType)
+struct FRandDamage
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MinDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxDamage;
+};
 
 USTRUCT(BlueprintType)
 struct FWeaponDataTable : public FTableRowBase
@@ -82,9 +92,9 @@ struct FWeaponDataTable : public FTableRowBase
 	bool bAutomatic;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Damage;
+	FRandDamage Damage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HeadshotDamage;
+	FRandDamage HeadshotDamage;
 
 };
 
@@ -190,11 +200,10 @@ class AAAMECHANICS_API AWeapon : public AItem
 
 	/** Amount of damage casue by a bullet */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
-	float Damage;
-
+	FRandDamage Damage;
 	/** wmount of damge when a bullet hits teh head */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
-	float HeadShotDamage;
+	FRandDamage HeadShotDamage;
 
 public:
 	AWeapon();
@@ -219,8 +228,8 @@ public:
 	FORCEINLINE UParticleSystem* GetMuzzleFlash() const { return MuzzleFlash; }
 	FORCEINLINE USoundCue* GetFireSound() const { return FireSound; }
 	FORCEINLINE bool GetAutomatic() const { return bAutomatic; }
-	FORCEINLINE float GetDamage() const { return Damage; }
-	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }
+	FORCEINLINE FRandDamage GetDamage() const { return Damage; }
+	FORCEINLINE FRandDamage GetHeadShotDamage() const { return HeadShotDamage; }
 	
 	/*************	 SETTERS	***************/
 	FORCEINLINE void SetMovingClip(bool Move) { bMovingClip = Move; }

@@ -318,5 +318,75 @@
 		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Other\\\\Explosive.h",
 		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
 		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Controllers\\\\AI\\\\EnemyController.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\Controllers\\\\AI\\\\EnemyController.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_ActivateLeftWeapon.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_ActivateLeftWeapon.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_DeactivateLeftWeapon.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_DeactivateLeftWeapon.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_ActivateRightWeapon.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_ActivateRightWeapon.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_DeactivateRightWeapon.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_DeactivateRightWeapon.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_FinishDeath.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_FinishDeath.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_FinishNiceCharDeath.cpp",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
+	},
+	{
+		"file": "E:\\\\Unreal Projects\\\\AAAMechanics\\\\Source\\\\AAAMechanics\\\\AnimNotifications\\\\AnimNotify_FinishNiceCharDeath.h",
+		"command": "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\cl.exe\" @\"E:\\Unreal Projects\\AAAMechanics\\.vscode\\compileCommands_Default\\AAAMechanics.204.rsp\"",
+		"directory": "E:\\Unreal Engine\\UE_4.27\\Engine\\Source"
 	}
 ]

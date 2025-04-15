@@ -14,6 +14,7 @@ enum class ECombatState  : uint8
 	ECS_FireTimerInProgress 			UMETA(DisplayName="FireTimerInProgress"),
 	ECS_Reloading						UMETA(DisplayName="Reloading"),
 	ECS_Equipping						UMETA(DisplayName="Equipping"),
+	ECS_Stunned							UMETA(DisplayName="Stunned"),
 
 	ECS_Max 							UMETA(DisplayName="DefaultMax")
 };
@@ -284,7 +285,36 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	int32 HightlightSlot;
+	
+	/** Character health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float Health;
 
+	/** Character max health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float MaxHealth;
+	
+	/** Sound made character gets hit by a melee attack */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* MeleeImpactSound;
+
+	/** Blood splatter particles fro melee hit */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* BloodParticles;
+
+	/** Hit react anim montage; for when character is stunned */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* HitReactMontage;
+	
+	/** Chance of begin stunned when hit by an enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float StunChance;
+	
+	/** Death montage for character death */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* DeathMontage;
+	
+	
 	/** Functions  */
 	void ResetPickupSoundTimer();
 	void ResetEquipSoundTimer();
@@ -292,6 +322,9 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ANiceCharacter();
+
+	// Take combat damage
+	virtual float TakeDamage(float, struct FDamageEvent const&, class AController* , AActor* ) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -376,17 +409,20 @@ protected:
 
 	/** checks to use if we have ammo of the EquippedWeapon's ammo type */
 	bool CarryingAmmo();
-
+	/** Called when pressed c button */
 	void CrouchButtonPressed();
-
+	/** Called when pressed space button */
 	virtual void Jump() override;
 
 	/** Inter calsule half height when crouching/ standing */
 	void InterpCapsuleHalfHeight(float DeltaTime);
-
+	
+	/** Called when aiming button is pressed */
 	void Aim();
+	/** Called when aiming button is released */
 	void StopAiming();
-
+	
+	/** Called when pickup button is pressed */
 	void PickupAmmo(class AAmmo* Ammo);
 	void InitializeInterpLocations();
 	
@@ -400,7 +436,6 @@ protected:
 	void ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex);
 	int32 GetEmptyInventorySlot();
 
-
 public:	
 	// Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -413,7 +448,7 @@ public:
 	
 	/** Adds/subtracts to/from OverlappedItemCount and updates bShouldTrceForItem */
 	void IncrementOverlappedItemCount(int8 Amount);
-	void GetPickupItem(AItem* Item);
+	void GetPickupItem(class AItem* Item);
 
 	void FinishReloading();
 	/** called from animNotity_grabClip*/
@@ -430,7 +465,7 @@ public:
 	/** return the index in interplocations array with the lowest itemcount */
 	int32 GetInterpLocationIndex();
 	void IncrementInterpLocationItemCount(int32 Index, int32 Amount);
-	
+
 	void StartPickupSoundTimer();
 	void StartEquipSoundTimer();
 	
@@ -440,6 +475,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EPhysicalSurface GetSurfaceType();
 	
+	UFUNCTION(BlueprintCallable)
+	void EndStun();
+	
+	void Stun();
+
+	void Die();
+	void FinishDeath();
+
 	/*************	 GETTTERS	***************/
 	/**	Returns CameraBoom subobject */
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return	CameraBoom; }
@@ -452,8 +495,10 @@ public:
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 	FORCEINLINE bool GetCrouching() const { return bCrouching; }
-	
+	FORCEINLINE USoundCue* GetMeleeImpactSound() const { return MeleeImpactSound; }
 	FORCEINLINE AWeapon* GetEquippedWeapon() const { return EquippedWeapon; }
+	FORCEINLINE UParticleSystem* GetBloodParticle() const { return BloodParticles; }
+	FORCEINLINE float GetStunChance() const { return StunChance; }
 
 	FORCEINLINE bool ShouldPlayPickupSound() const { return bShouldPlayEquipSound; }
 	FORCEINLINE bool ShouldPlayEquipSound() const { return bShouldPlayPickupSound; }
@@ -462,4 +507,5 @@ public:
 	/*****************************************/
 	void SetUnoccupied();
 	void ResetAiming();
+
 };

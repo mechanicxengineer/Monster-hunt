@@ -4,14 +4,24 @@
 #include "Explosive.h"
 
 #include "Kismet//GameplayStatics.h"
+#include "Components//StaticMeshComponent.h"
+#include "Components//SphereComponent.h"
 
 #include "Sound//SoundCue.h"
 
 #include "Particles//ParticleSystemComponent.h"
+#include "GameFramework//Character.h"
+#include "../DebugMacros.h"
 
 AExplosive::AExplosive()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	ExplosiveMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ExplosiveMesh"));
+	SetRootComponent(ExplosiveMesh);
+
+	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
+	OverlapSphere->SetupAttachment(RootComponent);
 
 }
 
@@ -38,6 +48,12 @@ void AExplosive::BulletHit_Implementation(FHitResult _hitResult)
 	}
 
 	// TODO apply explode damage
+	TArray<AActor*> OverlappingActors;
+	OverlapSphere->GetOverlappingActors(OverlappingActors, ACharacter::StaticClass());
+
+	for (auto Actor : OverlappingActors) {
+		showargplus("Actor damaged by explosive : %s",* Actor->GetName());
+	}
 
 	Destroy();
 }

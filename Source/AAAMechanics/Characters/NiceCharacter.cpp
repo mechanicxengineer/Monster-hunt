@@ -20,6 +20,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "BehaviorTree//BlackboardComponent.h"
 
 //	Custom includes
 #include "..//Items//Item.h"
@@ -28,6 +29,7 @@
 #include "..//Interfaces//BulletHItInterface.h"
 #include "..//Enemy//Enemy.h"
 #include "..//AAAMechanics.h"
+#include "..//Controllers//AI//EnemyController.h"
 
 //	Debug includes
 #include "..//Common//advlog.h"
@@ -94,7 +96,11 @@ ANiceCharacter::ANiceCharacter() :
 	  PickupSoundResetTime(0.2f),
 	  EquipSoundResetTime(0.2f),
 	  /** Icon animation properties */
-	  HightlightSlot(-1)
+	  HightlightSlot(-1),
+	  /** Character Health variables */
+	  Health(250.0f),
+	  MaxHealth(250.0f),
+	  StunChance(0.25f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -189,6 +195,38 @@ void ANiceCharacter::Tick(float DeltaTime)
     TraceForItem();
 	/** Interpolate the capsule half height based on crouching/ standing */
 	InterpCapsuleHalfHeight(DeltaTime);
+}
+
+float ANiceCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, 
+	class AController* InstigatorController, AActor* DamageCauser)
+{
+	if (Health - DamageAmount <= 0.0f) {
+		Health = 0.0f;
+		Die();
+		if (auto enemyController = Cast<AEnemyController>(InstigatorController)) {
+			enemyController->GetBlackboardComponent()->SetValueAsBool(FName("CharacterDead"), true);
+		}
+	}
+	else {
+		Health -= DamageAmount;
+	}
+	return DamageAmount;
+}
+
+void ANiceCharacter::Die()
+{
+	if (auto* AnimInstance = GetMesh()->GetAnimInstance()) {
+		AnimInstance->Montage_Play(DeathMontage);
+	}
+}
+
+void ANiceCharacter::FinishDeath()
+{
+	GetMesh()->bPauseAnims = true;
+	if (auto* playerController = UGameplayStatics::GetPlayerController(this,0)) {
+		DisableInput(playerController);
+	}
+
 }
 
 void ANiceCharacter::TraceForItem()
@@ -581,14 +619,16 @@ void ANiceCharacter::SendBullet()
 					int32 Damage{ 0 };
 					if (BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone()) {
 						/** Head shot */
-						Damage = EquippedWeapon->GetHeadShotDamage();
+						Damage = FMath::RandRange(EquippedWeapon->GetHeadShotDamage().MinDamage, 
+							EquippedWeapon->GetHeadShotDamage().MaxDamage);
 						UGameplayStatics::ApplyDamage(HitEnemy, Damage, 
 							GetController(), this, UDamageType::StaticClass());
 							HitEnemy->ShowDamageNumber(Damage, BeamHitResult.Location, true);
 					}
 					else {
 						/** Body shot */
-						Damage = EquippedWeapon->GetDamage();
+						Damage = FMath::RandRange(EquippedWeapon->GetDamage().MinDamage, 
+						EquippedWeapon->GetDamage().MaxDamage);
 						UGameplayStatics::ApplyDamage(HitEnemy, Damage, 
 							GetController(), this, UDamageType::StaticClass());
 							HitEnemy->ShowDamageNumber(Damage, BeamHitResult.Location, false);
@@ -683,8 +723,8 @@ bool ANiceCharacter::GetBeamEndLocation(const FVector &MuzzleSocketLocation, FHi
 void ANiceCharacter::AimingButtonPressed()
 {
 	bAimingButtonPressed = true;
-	if (CombatState != ECombatState::ECS_Reloading && 
-		CombatState != ECombatState::ECS_Equipping) {
+	if (CombatState != ECombatState::ECS_Reloading && CombatState != ECombatState::ECS_Equipping && 
+		CombatState != ECombatState::ECS_Stunned) {
 		Aim();
 	}
 }
@@ -786,7 +826,10 @@ void ANiceCharacter::StartFireTimer()
 
 void ANiceCharacter::AutoFireReset()
 {
-	SetUnoccupied();
+	if (CombatState != ECombatState::ECS_Stunned) {
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
+
 	if (EquippedWeapon == nullptr) return;
 	if (WeaponHasAmmo()) {
 		if (bFireButtonPressed && EquippedWeapon->GetAutomatic()) {
@@ -896,11 +939,7 @@ void ANiceCharacter::ReloadWeapon()
 void ANiceCharacter::FinishReloading()
 {
 	/** update the combat state */
-	//CombatState = ECombatState::ECS_Unoccupied;
 	SetUnoccupied();
-	if (bAimingButtonPressed) {
-		Aim();
-	}
 
 	if (EquippedWeapon == nullptr) return;
 	const auto ammoType{ EquippedWeapon->GetAmmoType() };
@@ -1099,7 +1138,26 @@ EPhysicalSurface ANiceCharacter::GetSurfaceType()
 		QuaryParams);
 	return UPhysicalMaterial::DetermineSurfaceType(hitResult.PhysMaterial.Get());
 }
- 
+
+void ANiceCharacter::EndStun()
+{
+	CombatState = ECombatState::ECS_Unoccupied;
+	if (bAimingButtonPressed) {
+		Aim();
+	}
+}
+
+void ANiceCharacter::Stun()
+{
+	if (Health <= 0.0f) return;
+	CombatState = ECombatState::ECS_Stunned;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage) {
+		AnimInstance->Montage_Play(HitReactMontage, 1.0f);
+	}
+
+}
+
 int32 ANiceCharacter::GetInterpLocationIndex()
 {
 	// Initialize the lowest index to 1
@@ -1149,7 +1207,11 @@ void ANiceCharacter::StartEquipSoundTimer()
 
 void ANiceCharacter::SetUnoccupied() 
 {
+	if (CombatState == ECombatState::ECS_Stunned) return;
 	CombatState = ECombatState::ECS_Unoccupied;
+	if (bAimingButtonPressed) {
+		Aim();
+	}
 }
 
 void ANiceCharacter::ResetAiming()

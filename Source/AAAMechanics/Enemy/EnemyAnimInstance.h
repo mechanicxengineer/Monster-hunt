@@ -14,4 +14,15 @@ class AAAMECHANICS_API UEnemyAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 	
+	/** Lateral Movement Speed */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float Speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class AEnemy* EnemyRef;
+
+public:
+	UFUNCTION(BlueprintCallable) 
+	void UpdateAnimationProperties(float DeltaTime);
+
 };
