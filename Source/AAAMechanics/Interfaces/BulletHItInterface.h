@@ -24,6 +24,6 @@ class AAAMECHANICS_API IBulletHitInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "BulletHit")
-	void BulletHit(FHitResult HitResult);
+	void BulletHit(FHitResult HitResult, AActor* Shooter, AController* EventInstigator);
 
 };

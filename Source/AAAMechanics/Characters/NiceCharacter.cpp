@@ -100,7 +100,8 @@ ANiceCharacter::ANiceCharacter() :
 	  /** Character Health variables */
 	  Health(250.0f),
 	  MaxHealth(250.0f),
-	  StunChance(0.25f)
+	  StunChance(0.25f),
+	  bIsDead(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -215,6 +216,7 @@ float ANiceCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 
 void ANiceCharacter::Die()
 {
+	bIsDead = true;
 	if (auto* AnimInstance = GetMesh()->GetAnimInstance()) {
 		AnimInstance->Montage_Play(DeathMontage);
 	}
@@ -226,7 +228,6 @@ void ANiceCharacter::FinishDeath()
 	if (auto* playerController = UGameplayStatics::GetPlayerController(this,0)) {
 		DisableInput(playerController);
 	}
-
 }
 
 void ANiceCharacter::TraceForItem()
@@ -267,7 +268,7 @@ void ANiceCharacter::TraceForItem()
 					TraceHitItem->SetCharacterInventoryFull(true);
 				}
 				else {
-				    /** Inventory has room */
+					/** Inventory has room */
 					TraceHitItem->SetCharacterInventoryFull(false);
 				}
 			}
@@ -612,7 +613,7 @@ void ANiceCharacter::SendBullet()
 			if (BeamHitResult.Actor.IsValid()) {
 				IBulletHitInterface* BulletHitInterface{ Cast<IBulletHitInterface>(BeamHitResult.Actor.Get()) };
 				if (BulletHitInterface) {
-					BulletHitInterface->BulletHit_Implementation(BeamHitResult);
+					BulletHitInterface->BulletHit_Implementation(BeamHitResult, this, GetController());
 				}
 
 				if (AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get())) {

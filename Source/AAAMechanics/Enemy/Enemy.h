@@ -189,17 +189,17 @@ protected:
 	void ResetCanAttack();
 
 	UFUNCTION()
-    void OnLeftWeaponOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp,
-        int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+	void OnLeftWeaponOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 
-    UFUNCTION()
+	UFUNCTION()
 	void OnRightWeaponOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:	
 	virtual void Tick(float DeltaTime) override;
  	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void BulletHit_Implementation(FHitResult _hitResult) override;
+	virtual void BulletHit_Implementation(FHitResult _hitResult, AActor* Shooter, AController* InstigatorController) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, 
 		 AActor* DamageCauser) override;
 	

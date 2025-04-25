@@ -27,6 +27,9 @@ class AAAMECHANICS_API AExplosive : public AActor, public IBulletHitInterface
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* OverlapSphere;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float ExplosionDamage;
+
 public:	
 	AExplosive();
 
@@ -35,6 +38,6 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	virtual void BulletHit_Implementation(FHitResult _hitResult) override;
+	virtual void BulletHit_Implementation(FHitResult _hitResult, AActor* Shooter, AController* InstigatorController) override;
 
 };

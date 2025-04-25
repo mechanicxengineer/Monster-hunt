@@ -314,7 +314,10 @@ class AAAMECHANICS_API ANiceCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* DeathMontage;
 	
-	
+	/** ture when character dies */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	bool bIsDead;
+
 	/** Functions  */
 	void ResetPickupSoundTimer();
 	void ResetEquipSoundTimer();

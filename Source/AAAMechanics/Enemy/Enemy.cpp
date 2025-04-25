@@ -102,8 +102,8 @@ void AEnemy::BeginPlay()
 	
 	const FVector WorldPatrolPoint{ UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint) };
 	const FVector WorldPatrolPoint2{ UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint2) };
-	draw_sphere(WorldPatrolPoint, 50.f, 12.0f);
-	draw_sphere(WorldPatrolPoint2, 50.f, 12.0f);
+	// draw_sphere(WorldPatrolPoint, 50.f, 12.0f);
+	// draw_sphere(WorldPatrolPoint2, 50.f, 12.0f);
 	if (EnemyController) {
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WorldPatrolPoint);
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint2"), WorldPatrolPoint2);
@@ -125,7 +125,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AEnemy::BulletHit_Implementation(FHitResult _hitResult)
+void AEnemy::BulletHit_Implementation(FHitResult _hitResult, AActor* Shooter, AController* InstigatorController)
 {
 	if (ImpactSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
@@ -135,16 +135,6 @@ void AEnemy::BulletHit_Implementation(FHitResult _hitResult)
 			_hitResult.Location, FRotator::ZeroRotator, true);
 	}
 	
-	if (bDying) return;
-	ShowHealthBar();
-	
-	/** Determine wethere bullet hit stuns */
-	const float Stunned = FMath::FRandRange(0.f, 1.f);
-	if (Stunned <= StunChance) {
-		/** stun the Enemy */
-		PlayHitMontage(FName("HitFront"));
-		SetStunned(true);
-	}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -160,6 +150,18 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	else {
 		Health -= DamageAmount;
 	}
+
+	if (bDying) return DamageAmount;
+	ShowHealthBar();
+	
+	/** Determine wethere bullet hit stuns */
+	const float Stunned = FMath::FRandRange(0.f, 1.f);
+	if (Stunned <= StunChance) {
+		/** stun the Enemy */
+		PlayHitMontage(FName("HitFront"));
+		SetStunned(true);
+	}
+
 	return DamageAmount;
 }
 
@@ -213,7 +215,7 @@ void AEnemy::StoreDamageNumber(UUserWidget* DamageNumber, FVector HitLocation)
 
 		FTimerHandle DamageHitTimer;
  		FTimerDelegate DamageNumberDelegate;
-
+		/** Bind the damage number system */
 		DamageNumberDelegate.BindUFunction(this, FName("DestroyDamageNumber"), DamageNumber);
 		GetWorldTimerManager().SetTimer(
 			DamageHitTimer, 
@@ -256,8 +258,11 @@ void AEnemy::AgroSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor == nullptr) return;
 	auto Character = Cast<ANiceCharacter>(OtherActor);
 	if (Character) {
-		/** Set the value of the target blackboard key */
-		EnemyController->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Character);
+		if (EnemyController) {
+			if (EnemyController->GetBlackboardComponent()) {
+				EnemyController->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Character);
+			}
+		}
 	}
 }
 

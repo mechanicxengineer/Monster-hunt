@@ -13,7 +13,8 @@
 #include "GameFramework//Character.h"
 #include "../DebugMacros.h"
 
-AExplosive::AExplosive()
+AExplosive::AExplosive() :
+	ExplosionDamage(400.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -37,7 +38,7 @@ void AExplosive::Tick(float DeltaTime)
 
 }
 
-void AExplosive::BulletHit_Implementation(FHitResult _hitResult)
+void AExplosive::BulletHit_Implementation(FHitResult _hitResult, AActor* Shooter, AController* InstigatorController)
 {
 	if (ImpactSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
@@ -46,13 +47,14 @@ void AExplosive::BulletHit_Implementation(FHitResult _hitResult)
 		UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeParticles,
 			_hitResult.Location, FRotator::ZeroRotator, true);
 	}
-
-	// TODO apply explode damage
+	
 	TArray<AActor*> OverlappingActors;
 	OverlapSphere->GetOverlappingActors(OverlappingActors, ACharacter::StaticClass());
 
 	for (auto Actor : OverlappingActors) {
 		showargplus("Actor damaged by explosive : %s",* Actor->GetName());
+		UGameplayStatics::ApplyDamage(Actor, ExplosionDamage, InstigatorController,
+			 Shooter, UDamageType::StaticClass());
 	}
 
 	Destroy();
