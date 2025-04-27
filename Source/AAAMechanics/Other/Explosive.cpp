@@ -23,19 +23,16 @@ AExplosive::AExplosive() :
 
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
 	OverlapSphere->SetupAttachment(RootComponent);
-
 }
 
 void AExplosive::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AExplosive::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AExplosive::BulletHit_Implementation(FHitResult _hitResult, AActor* Shooter, AController* InstigatorController)
@@ -52,7 +49,7 @@ void AExplosive::BulletHit_Implementation(FHitResult _hitResult, AActor* Shooter
 	OverlapSphere->GetOverlappingActors(OverlappingActors, ACharacter::StaticClass());
 
 	for (auto Actor : OverlappingActors) {
-		showargplus("Actor damaged by explosive : %s",* Actor->GetName());
+		//showargplus("Actor damaged by explosive : %s",* Actor->GetName());
 		UGameplayStatics::ApplyDamage(Actor, ExplosionDamage, InstigatorController,
 			 Shooter, UDamageType::StaticClass());
 	}
